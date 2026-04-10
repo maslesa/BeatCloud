@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+@theme {
+  --color-mybg: #1D1D1D;
+  --color-mybg2: #303030;
+  --color-mylight: #F8F3ED;
+}
+
+.noise::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      rgba(248, 243, 237, 0.12) 0,
+      rgba(248, 243, 237, 0.12) 1px,
+      transparent 1px,
+      transparent 10px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(248, 243, 237, 0.12) 0,
+      rgba(248, 243, 237, 0.12) 1px,
+      transparent 1px,
+      transparent 10px
+    );
+  opacity: 0.25;
+}
