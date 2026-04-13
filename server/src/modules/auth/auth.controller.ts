@@ -22,6 +22,26 @@ export const register = async (req: Request, res: Response) => {
   }
 };
 
+export const verifyEmail = async (req: Request, res: Response) => {
+  try {
+    const { token } = req.query;
+
+    await authService.verifyEmail(token as string);
+
+    res.send("Email verified successfully!");
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({
+        message: error.message,
+      });
+    } else {
+      res.status(400).json({
+        message: "Something went wrong",
+      });
+    }
+  }
+};
+
 export const login = async (req: Request, res: Response) => {
   try {
     const result = await authService.loginUser(req.body);
