@@ -3,6 +3,7 @@ import * as hash from "../../utils/hash";
 import * as crypto from "node:crypto";
 import * as token from "../../utils/token";
 import { sendMail } from "../../utils/email";
+import { getGoogleClient } from "../../utils/google";
 
 function getAppURL() {
   return process.env.APP_URL || `http://localhost:${process.env.PORT}`;
@@ -103,6 +104,79 @@ export const loginUser = async (data: { email: string; password: string }) => {
       id: user.id,
       email: user.email,
       username: user.username,
+    },
+  };
+};
+
+export const googleAuthHandler = async (code: string) => {
+  const client = getGoogleClient();
+
+  const { tokens } = await client.getToken(code);
+
+  if (!tokens.id_token) throw new Error("No Google ID token.");
+
+  const ticket = await client.verifyIdToken({
+    idToken: tokens.id_token,
+    audience: process.env.GOOGLE_CLIENT_ID,
+  });
+
+  const payload = ticket.getPayload();
+
+  const email = payload?.email;
+  const emailVerified = payload?.email_verified;
+  const name = payload?.name;
+  const picture = payload?.picture;
+  const googleID = payload?.sub;
+
+  if (!email || !emailVerified)
+    throw new Error("Google email is not verified.");
+
+  let user = await prisma.user.findFirst({
+    where: { OR: [{ email }, { googleId: googleID }] },
+  });
+
+  if (!user) {
+    user = await prisma.user.create({
+      data: {
+        email,
+        username: `${name}_${Math.floor(Math.random() * 10000)}`,
+        googleId: googleID,
+        isVerified: true,
+        profileImageURL: picture,
+      },
+    });
+  }
+
+  if (user && !user.googleId) {
+    user = await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        googleId: googleID,
+        isVerified: true,
+        profileImageURL: user.profileImageURL || picture,
+      },
+    });
+  }
+
+  const accessToken = token.createAccessToken(user.id);
+
+  const refreshToken = crypto.randomBytes(64).toString("hex");
+  await prisma.refreshToken.create({
+    data: {
+      token: refreshToken,
+      userId: user.id,
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    },
+  });
+
+  return {
+    accessToken,
+    refreshToken,
+    user: {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      profileImageURL: user.profileImageURL,
     },
   };
 };

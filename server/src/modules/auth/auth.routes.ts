@@ -7,6 +7,9 @@ const router = Router();
 
 router.post("/register", validate(registerSchema), authController.register);
 router.post("/login", validate(loginSchema), authController.login);
-router.get('/verify-email', authController.verifyEmail);
+router.get("/verify-email", authController.verifyEmail);
+
+router.get("/google", authController.googleAuthStartHandler);
+router.get("/google/callback", authController.googleAuthCallbackHandler);
 
 export default router;
