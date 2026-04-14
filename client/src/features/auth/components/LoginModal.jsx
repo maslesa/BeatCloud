@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { login } from "../api/auth.api";
 import { useAuthStore } from "../store/useAuthStore";
+import GoogleButton from "./GoogleButton";
 
 export default function LoginModal({ onClose }) {
 
@@ -44,10 +45,7 @@ export default function LoginModal({ onClose }) {
 
         <div className="w-full h-0.5 bg-mybg mb-5 rounded-2xl"></div>
 
-        <button className="bg-mybg text-mylight w-full py-3 rounded flex items-center justify-center gap-2 cursor-pointer hover:bg-mybg2 duration-200">
-          <img className="w-5" src="/icons/google.png" alt="google_img" />
-          Continue with Google
-        </button>
+        <GoogleButton/>
 
         <img onClick={onClose} className="absolute top-3 right-3 w-4 cursor-pointer hover:scale-105 duration-200" src="/icons/close.png" alt="close_icon" />
 
