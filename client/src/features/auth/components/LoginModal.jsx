@@ -3,6 +3,7 @@ import { login } from "../api/auth.api";
 import { useAuthStore } from "../store/useAuthStore";
 import GoogleButton from "./GoogleButton";
 import { useNavigate } from 'react-router-dom';
+import { useAlertStore } from "../../../shared/hooks/useAlertStore";
 
 export default function LoginModal({ onClose }) {
 
@@ -11,6 +12,8 @@ export default function LoginModal({ onClose }) {
   const navigate = useNavigate();
 
   // add loading
+
+  const showAlert = useAlertStore((state) => state.showAlert);
 
   const [form, setForm] = useState({
     email: '',
@@ -31,7 +34,7 @@ export default function LoginModal({ onClose }) {
       onClose();
       navigate('/home');
     } catch (error) {
-      alert(error.response?.data?.message || error.message);
+      showAlert(error.response?.data?.message || error.message, "error");
     }
   }
 

@@ -2,12 +2,15 @@ import { useState } from "react";
 import { register } from "../api/auth.api";
 import GoogleButton from "./GoogleButton";
 import { useNavigate } from 'react-router-dom';
+import { useAlertStore } from "../../../shared/hooks/useAlertStore";
 
 export default function RegisterModal({ onClose }) {
 
   const navigate = useNavigate();
 
   // add loading
+
+  const showAlert = useAlertStore((state) => state.showAlert);
 
   const [form, setForm] = useState({
     username: '',
@@ -25,11 +28,10 @@ export default function RegisterModal({ onClose }) {
   const handleSubmit = async () => {
     try {
       await register(form);
-      alert('Check your email to verify account.');
+      showAlert('Check your email to verify account.', "success");
       onClose();
-      navigate('/home');
     } catch (error) {
-      alert(error.response?.data?.message || error.message);
+      showAlert(error.response?.data?.message || error.message, "error");
     }
   }
 
@@ -49,7 +51,7 @@ export default function RegisterModal({ onClose }) {
 
         <div className="w-full h-0.5 bg-mybg mb-5 rounded-2xl"></div>
 
-        <GoogleButton/>
+        <GoogleButton />
 
         <img onClick={onClose} className="absolute top-3 right-3 w-4 cursor-pointer hover:scale-105 duration-200" src="/icons/close.png" alt="close_icon" />
 

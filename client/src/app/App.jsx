@@ -3,6 +3,7 @@ import { useAuthModal } from '../shared/hooks/useAuthModal';
 import LoginModal from '../features/auth/components/LoginModal';
 import RegisterModal from '../features/auth/components/RegisterModal';
 import AuthProvider from './AuthProvider';
+import ErrorAlert from '../shared/components/ErrorAlert';
 
 function App() {
   const { type, close } = useAuthModal();
@@ -10,6 +11,8 @@ function App() {
   return (
     <AuthProvider>
       <Router />
+
+      <ErrorAlert />
 
       {type === 'login' && <LoginModal onClose={close} />}
       {type === 'register' && <RegisterModal onClose={close} />}
