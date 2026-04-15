@@ -1,9 +1,30 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../features/auth/store/useAuthStore";
+import DropdownMenu from "./DropdownMenu";
+import { useState, useRef } from "react";
+import { logout as logoutAPI } from "../../features/auth/api/auth.api";
+import { useAlertStore } from "../../shared/hooks/useAlertStore";
 
 export default function Navbar() {
   const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
+  const showAlert = useAlertStore((state) => state.showAlert);
+
   const navigate = useNavigate();
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const triggerRef = useRef();
+
+  const handleLogout = async () => {
+    try {
+      await logoutAPI();
+    } catch (error) {
+      showAlert(error.response?.data?.message || error.message, "error");
+    } finally {
+      logout();
+      navigate('/');
+    }
+  }
 
   return (
     <nav className="w-full flex items-center justify-between py-4 h-20 bg-mybg">
@@ -38,11 +59,31 @@ export default function Navbar() {
             >
               <img className="w-5 rounded-full" src="/icons/notification.png" alt="" />
             </button>
-            <button
-              className="opacity-60 hover:opacity-100 cursor-pointer duration-200"
-            >
-              <img className="w-5 rounded-full" src="/icons/more.png" alt="" />
-            </button>
+
+            <div className="relative flex items-center">
+              <button
+                ref={triggerRef}
+                onClick={() => setIsMenuOpen(prev => !prev)}
+                className="opacity-60 hover:opacity-100 cursor-pointer duration-200"
+              >
+                <img className="w-5" src="/icons/more.png" alt="" />
+              </button>
+
+              <DropdownMenu
+                isOpen={isMenuOpen}
+                onClose={() => setIsMenuOpen(false)}
+                triggerRef={triggerRef}
+              >
+                <div className="border-t border-mybg my-2"></div>
+
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left font-bold text-red-400 rounded-md px-4 py-2 hover:bg-mybg duration-100 cursor-pointer"
+                >
+                  Sign out
+                </button>
+              </DropdownMenu>
+            </div>
           </>
         )}
       </div>

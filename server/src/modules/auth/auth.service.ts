@@ -180,3 +180,13 @@ export const googleAuthHandler = async (code: string) => {
     },
   };
 };
+
+export const logout = async (refreshToken: string) => {
+  if (!refreshToken) return;
+
+  await prisma.refreshToken.deleteMany({
+    where: {
+      token: refreshToken,
+    },
+  });
+};

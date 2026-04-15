@@ -167,3 +167,27 @@ export const me = async (req: Request, res: Response) => {
     }
   }
 };
+
+export const logout = async (req: Request, res: Response) => {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+
+    await authService.logout(refreshToken);
+
+    res.clearCookie("refreshToken");
+
+    return res.status(200).json({
+      message: "Logged out successfully.",
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({
+        message: error.message,
+      });
+    } else {
+      res.status(500).json({
+        message: "Internal server error.",
+      });
+    }
+  }
+};
