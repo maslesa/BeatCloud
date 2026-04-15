@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import * as authService from "./auth.service";
 import { getGoogleClient } from "../../utils/google";
+import { prisma } from "../../config/db";
+import * as token from "../../utils/token";
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -119,10 +121,39 @@ export const googleAuthCallbackHandler = async (
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    return res.status(200).json({
-      message: "Google login successfully",
-      accessToken: result.accessToken,
-      user: result.user,
+    return res.redirect(`${process.env.FRONTEND_URL}/home`);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({
+        message: error.message,
+      });
+    } else {
+      res.status(500).json({
+        message: "Internal server error.",
+      });
+    }
+  }
+};
+
+export const me = async (req: Request, res: Response) => {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+
+    if (!refreshToken)
+      return res.status(401).json({ message: "You are not logged in." });
+
+    const session = await prisma.refreshToken.findFirst({
+      where: { token: refreshToken },
+      include: { user: true },
+    });
+
+    if (!session) return res.status(401).json({ message: "Invalid session." });
+
+    const accessToken = token.createAccessToken(session.user.id);
+
+    return res.json({
+      user: session.user,
+      accessToken,
     });
   } catch (error) {
     if (error instanceof Error) {

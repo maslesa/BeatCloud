@@ -12,4 +12,6 @@ router.get("/verify-email", authController.verifyEmail);
 router.get("/google", authController.googleAuthStartHandler);
 router.get("/google/callback", authController.googleAuthCallbackHandler);
 
+router.get("/me", authController.me);
+
 export default router;

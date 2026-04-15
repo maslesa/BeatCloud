@@ -2,10 +2,15 @@ import { useState } from "react";
 import { login } from "../api/auth.api";
 import { useAuthStore } from "../store/useAuthStore";
 import GoogleButton from "./GoogleButton";
+import { useNavigate } from 'react-router-dom';
 
 export default function LoginModal({ onClose }) {
 
   const setAuth = useAuthStore((state) => state.setAuth);
+
+  const navigate = useNavigate();
+
+  // add loading
 
   const [form, setForm] = useState({
     email: '',
@@ -24,7 +29,7 @@ export default function LoginModal({ onClose }) {
       const res = await login(form);
       setAuth(res.user, res.accessToken);
       onClose();
-      alert('Login successfully');
+      navigate('/home');
     } catch (error) {
       alert(error.response?.data?.message || error.message);
     }
@@ -45,7 +50,7 @@ export default function LoginModal({ onClose }) {
 
         <div className="w-full h-0.5 bg-mybg mb-5 rounded-2xl"></div>
 
-        <GoogleButton/>
+        <GoogleButton />
 
         <img onClick={onClose} className="absolute top-3 right-3 w-4 cursor-pointer hover:scale-105 duration-200" src="/icons/close.png" alt="close_icon" />
 

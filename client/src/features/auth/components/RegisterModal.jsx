@@ -1,9 +1,13 @@
 import { useState } from "react";
 import { register } from "../api/auth.api";
 import GoogleButton from "./GoogleButton";
-
+import { useNavigate } from 'react-router-dom';
 
 export default function RegisterModal({ onClose }) {
+
+  const navigate = useNavigate();
+
+  // add loading
 
   const [form, setForm] = useState({
     username: '',
@@ -23,7 +27,7 @@ export default function RegisterModal({ onClose }) {
       await register(form);
       alert('Check your email to verify account.');
       onClose();
-      alert('Registration successfully');
+      navigate('/home');
     } catch (error) {
       alert(error.response?.data?.message || error.message);
     }
