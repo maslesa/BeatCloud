@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import authRoutes from "./modules/auth/auth.routes";
+import trackRoutes from "./modules/track/track.routes";
 import cookieParser from 'cookie-parser';
 
 const app = express();
@@ -15,8 +16,9 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
+app.use("/api/track", trackRoutes);
 
-app.get("/api/health-check", (req, res) => {
+app.get("/api/health-check", (_req, res) => {
   res.json({
     message: "Server is running!",
   });
