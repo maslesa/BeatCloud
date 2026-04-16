@@ -49,15 +49,19 @@ model RefreshToken {
 }
 
 model Track {
-  id             String    @id @default(uuid())
+  id             String  @id @default(uuid())
   title          String
   description    String?
   duration       Float?
-  isDownloadable Boolean   @default(false)
-  audioURL       String
-  coverURL       String
-  trackType      TrackType
-  createdAt      DateTime  @default(now())
+  isDownloadable Boolean @default(false)
+
+  audioURL      String
+  coverURL      String
+  audioPublicID String
+  coverPublicID String
+
+  trackType TrackType
+  createdAt DateTime  @default(now())
 
   authorId String
   author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
