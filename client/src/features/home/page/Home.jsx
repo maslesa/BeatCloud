@@ -1,12 +1,17 @@
-export default function Home() {
-  return (
-    <div className="">
-      <h1 className="text-2xl font-bold mb-4">Feed</h1>
+import TrackList from "../../track/components/TrackList";
+import { useEffect, useState } from "react";
+import { getAllTracks } from "../../track/api/track.api";
+import { useAlertStore } from '../../../shared/hooks/useAlertStore';
+import { useTracks } from "../../track/hooks/useTracks";
 
-      <div className="space-y-4">
-        <div className="p-4 bg-mybg2 rounded">Track 1</div>
-        <div className="p-4 bg-mybg2 rounded">Track 2</div>
-      </div>
+export default function Home() {
+
+  const { tracks } = useTracks();
+
+  return (
+    <div className="mt-5">
+      <h1 className="text-2xl font-bold">Recent tracks</h1>
+      <TrackList tracks={tracks} />
     </div>
   );
 }

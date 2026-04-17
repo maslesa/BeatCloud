@@ -7,7 +7,7 @@ export default function ProfileHeader({ user }) {
         <div className="w-full h-45 px-10 flex items-center justify-between bg-mybg2 rounded-lg">
 
             <div className="flex w-200 items-center gap-5">
-                <img className={`w-30 rounded-full shadow-lg ${user.isVerified ? 'border-4 border-green-600' : 'border-0'}`} src={user.profileImageURL} alt="" />
+                <img className={`w-30 rounded-full shadow-lg ${user.isVerified ? 'border-4 border-green-600' : 'border-0'}`} src={user.profileImageURL || "/icons/default-avatar.png"} alt="" />
                 <div className="flex flex-col gap-2">
                     <h2 className="font-bold text-2xl">{user.username}</h2>
                     <h2 className="font-normal text-md opacity-60">{user.email}</h2>

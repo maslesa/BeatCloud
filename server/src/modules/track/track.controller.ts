@@ -27,7 +27,7 @@ export const getAllTracks = async (_req: Request, res: Response) => {
     const result = await trackService.getAllTracks();
 
     res.status(200).json({
-      message: "All messages fetched successfully",
+      message: "All tracks fetched successfully",
       tracks: result,
     });
   } catch (error) {

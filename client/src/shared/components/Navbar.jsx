@@ -27,7 +27,7 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="w-full flex items-center justify-between py-4 h-20 bg-mybg">
+    <nav className="w-full flex items-center justify-between py-4 px-50 h-20 bg-mybg fixed top-0 left-0 z-9000">
 
       <Link to="/home" className="text-xl font-bold">
         BeatCloud
@@ -49,9 +49,9 @@ export default function Navbar() {
             </button>
             <button
               onClick={() => navigate(`/profile/${user.username}`)}
-              className="hover:opacity-80 cursor-pointer duration-200 mr-8"
+              className="hover:opacity-80 cursor-pointer duration-200 mr-8 flex items-center justify-center"
             >
-              <img className="w-7 rounded-full" src={user.profileImageURL} alt="" />
+              <img className="w-7 h-7 rounded-full" src={user.profileImageURL || "/icons/default-avatar.png"} alt="" />
             </button>
 
             <button
