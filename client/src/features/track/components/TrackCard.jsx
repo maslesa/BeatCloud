@@ -1,6 +1,16 @@
 
 
-export default function TrackCard({ track }) {
+export default function TrackCard({ track, loggedUser, onDelete }) {
+
+    const handleDeleteClick = () => {
+        const confirmed = window.confirm('Are you sure you want to delete this track?');
+
+        if(!confirmed) return;
+
+        onDelete(track.id);
+    }
+
+
     return (
         <div className="w-full h-80 flex flex-col gap-3 bg-mybg2 rounded-md p-3">
             <div className="w-full h-1/2 flex gap-2">
@@ -15,29 +25,34 @@ export default function TrackCard({ track }) {
                     </div>
                     <div className="flex w-full h-1/4 px-3 items-center justify-between">
                         <div className="flex gap-2 w-1/2 h-full items-center">
-                            <div className="flex gap-2 p-2 w-20 h-10 bg-mybg items-center justify-center rounded-md cursor-pointer hover:scale-102 duration-150">
+                            <div className="flex gap-2 p-2 w-20 h-10 bg-mybg items-center justify-center rounded-md cursor-pointer">
                                 <img className="w-5" src="/icons/like.png" alt="" />
                                 <p>23</p>
                             </div>
-                            <div className="flex gap-2 p-2 w-20 h-10 bg-mybg items-center justify-center rounded-md cursor-pointer hover:scale-102 duration-150">
+                            <div className="flex gap-2 p-2 w-20 h-10 bg-mybg items-center justify-center rounded-md cursor-pointer">
                                 <img className="w-5" src="/icons/comment.png" alt="" />
                                 <p>10</p>
                             </div>
-                            <div className="flex gap-2 p-2 w-10 h-10 bg-mybg items-center justify-center rounded-md cursor-pointer hover:scale-102 duration-150">
+                            <div className="flex gap-2 p-2 w-10 h-10 bg-mybg items-center justify-center rounded-md cursor-pointer">
                                 <img className="w-5" src="/icons/copy.png" alt="" />
                             </div>
                             {track.isDownloadable && (
-                                <div className="flex gap-2 p-2 w-10 h-10 bg-mybg items-center justify-center rounded-md cursor-pointer hover:scale-102 duration-150">
+                                <div className="flex gap-2 p-2 w-10 h-10 bg-mybg items-center justify-center rounded-md cursor-pointer">
                                     <img className="w-5" src="/icons/download.png" alt="" />
+                                </div>
+                            )}
+                            {track.author.username === loggedUser && (
+                                <div onClick={() => onDelete(track.id)} className="flex gap-2 p-2 w-10 h-10 bg-mybg items-center justify-center rounded-md cursor-pointer">
+                                    <img className="w-5" src="/icons/delete.png" alt="" />
                                 </div>
                             )}
                         </div>
 
                         <div className="flex gap-2 w-1/2 h-full justify-end">
-                            <div className="flex gap-2 p-2 w-20 h-10 bg-mybg items-center justify-center rounded-md cursor-pointer hover:scale-102 duration-150">
+                            <div className="flex gap-2 p-2 w-20 h-10 bg-mybg items-center justify-center rounded-md cursor-pointer">
                                 <p>{track.trackType.charAt(0).toUpperCase() + track.trackType.slice(1).toLowerCase()}</p>
                             </div>
-                            <div className="flex gap-2 p-2 w-30 h-10 bg-mybg items-center justify-center rounded-md cursor-pointer hover:scale-102 duration-150">
+                            <div className="flex gap-2 p-2 w-30 h-10 bg-mybg items-center justify-center rounded-md cursor-pointer">
                                 <p>Key: G min</p>
                             </div>
                         </div>

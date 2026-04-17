@@ -20,6 +20,6 @@ export const useTracks = () => {
         fetchTracks();
     }, []);
 
-    return { tracks };
+    return { tracks, setTracks };
 
 }

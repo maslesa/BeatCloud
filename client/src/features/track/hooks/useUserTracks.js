@@ -23,6 +23,6 @@ export const useUserTracks = (username) => {
         fetchTracks();
     }, [username]);
 
-    return { tracks };
+    return { tracks, setTracks };
 
 }
