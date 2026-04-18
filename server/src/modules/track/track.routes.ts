@@ -31,5 +31,6 @@ router.put(
   upload.fields([{ name: "cover", maxCount: 1 }]),
   trackController.updateTrack,
 );
+router.get("/download/:trackID", trackController.downloadTrack);
 
 export default router;

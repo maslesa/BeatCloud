@@ -188,3 +188,16 @@ export const updateTrack = async (req: any) => {
 
   return updatedTrack;
 };
+
+export const downloadTrack = async (trackID: string) => {
+  const track = await prisma.track.findUnique({
+    where: { id: trackID },
+  });
+
+  if (!track) throw new Error("Track not found.");
+
+  if (!track.isDownloadable)
+    throw new Error("This track is not available for download.");
+
+  return track;
+};

@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import * as trackService from "./track.service";
+import axios from "axios";
 
 export const uploadTrack = async (req: Request, res: Response) => {
   try {
@@ -137,4 +138,34 @@ export const updateTrack = async (req: Request, res: Response) => {
       });
     }
   }
-}
+};
+
+export const downloadTrack = async (req: Request, res: Response) => {
+  try {
+    const { trackID } = req.params;
+
+    const track = await trackService.downloadTrack(trackID as string);
+
+    const response = await axios.get(track.audioURL, {
+      responseType: "stream",
+    });
+
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${track.title}.wav"`,
+    );
+    res.setHeader("Content-Type", "audio/wav");
+
+    response.data.pipe(res);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({
+        message: error.message,
+      });
+    } else {
+      res.status(500).json({
+        message: "Internal server error.",
+      });
+    }
+  }
+};

@@ -14,3 +14,7 @@ export const deleteTrack = async (trackID) => {
     const res = await api.delete(`/track/${trackID}`);
     return res.data;
 }
+
+export const downloadTrack = async (trackID) => {
+    window.open(`${import.meta.env.VITE_API_URL}/track/download/${trackID}`);
+}

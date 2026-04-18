@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { downloadTrack } from '../api/track.api';
 
 export default function TrackCard({ track, loggedUser, onDelete }) {
 
@@ -38,16 +39,16 @@ export default function TrackCard({ track, loggedUser, onDelete }) {
                                 <img className="w-5" src="/icons/copy.png" alt="" />
                             </div>
                             {track.isDownloadable && (
-                                <div title="download" className="flex gap-2 p-2 w-10 h-10 bg-mybg items-center justify-center rounded-md cursor-pointer">
+                                <div onClick={() => downloadTrack(track.id)} title="download" className="flex gap-2 p-2 w-10 h-10 bg-mybg items-center justify-center rounded-md cursor-pointer">
                                     <img className="w-5" src="/icons/download.png" alt="" />
                                 </div>
                             )}
-                            {track.author.username === loggedUser && (
+                            {track.author?.username === loggedUser && (
                                 <div title="delete" onClick={() => onDelete(track.id)} className="flex gap-2 p-2 w-10 h-10 bg-mybg items-center justify-center rounded-md cursor-pointer">
                                     <img className="w-5" src="/icons/delete.png" alt="" />
                                 </div>
                             )}
-                            {track.author.username === loggedUser && (
+                            {track.author?.username === loggedUser && (
                                 <div title="edit" className="flex gap-2 p-2 w-10 h-10 bg-mybg items-center justify-center rounded-md cursor-pointer">
                                     <img className="w-5" src="/icons/edit.png" alt="" />
                                 </div>
