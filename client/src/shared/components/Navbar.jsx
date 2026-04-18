@@ -43,6 +43,7 @@ export default function Navbar() {
         {user && (
           <>
             <button
+              onClick={() => navigate('/upload')}
               className="bg-mybg2 w-30 p-1 py-2.5 mr-3 rounded-sm text-sm cursor-pointer duration-200 hover:opacity-80"
             >
               Upload

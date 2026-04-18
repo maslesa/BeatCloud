@@ -115,6 +115,7 @@ export const getUsersTracks = async (username: string) => {
     include: {
       tracks: {
         include: { author: true },
+        orderBy: { createdAt: "desc" },
       },
     },
   });

@@ -21,10 +21,12 @@ export default function Home() {
 
   const handleDelete = async (trackID) => {
     try {
+      setIsConfirmOpen(false);
       await deleteTrack(selectedTrack);
       setTracks((prev) => prev.filter((t) => t.id !== selectedTrack));
       showAlert("Track deleted successfully.", "success");
     } catch (error) {
+      setIsConfirmOpen(false);
       showAlert(error.response?.data?.message || error.message, "error");
     }
   }

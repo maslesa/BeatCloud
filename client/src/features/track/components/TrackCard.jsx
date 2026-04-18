@@ -13,9 +13,6 @@ export default function TrackCard({ track, loggedUser, onDelete }) {
         onDelete(track.id);
     }
 
-    console.log(track.waveform);
-
-
     return (
         <div className="w-full h-80 flex flex-col gap-3 bg-mybg2 rounded-md p-3">
             <div className="w-full h-1/2 flex gap-2">
