@@ -29,8 +29,8 @@ export default function Navbar() {
   return (
     <nav className="w-full flex items-center justify-between py-4 px-50 h-20 bg-mybg fixed top-0 left-0 z-9000">
 
-      <Link to="/home" className="text-xl font-bold">
-        BeatCloud
+      <Link to="/home" className="text-xl font-bold hover:opacity-80 duration-200">
+        <img className="w-15" src="/icons/logo.png" alt="" />
       </Link>
 
       <div className="flex justify-center items-center gap-3">

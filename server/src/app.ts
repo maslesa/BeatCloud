@@ -2,7 +2,8 @@ import express from "express";
 import cors from "cors";
 import authRoutes from "./modules/auth/auth.routes";
 import trackRoutes from "./modules/track/track.routes";
-import cookieParser from 'cookie-parser';
+import userRoutes from "./modules/user/user.routes";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/track", trackRoutes);
+app.use("/api/user", userRoutes);
 
 app.get("/api/health-check", (_req, res) => {
   res.json({

@@ -4,7 +4,7 @@ export default function ConfirmModal({ isOpen, onClose, onConfirm, message }) {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-10000">
             <div className="bg-mylight text-mybg p-6 rounded-lg w-96 flex flex-col gap-1">
 
                 <h2 className="text-2xl font-bold">Are you sure?</h2>
