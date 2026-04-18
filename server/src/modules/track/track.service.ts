@@ -3,6 +3,7 @@ import { prisma } from "../../config/db";
 import streamifier from "streamifier";
 import { getAudioDuration } from "../../utils/audio";
 import { TrackAnalytics } from "../../models/TrackAnalitycs";
+import { generateWaveform } from "../../utils/waveform";
 
 const uploadToCloudinary = (
   buffer: Buffer,
@@ -21,10 +22,10 @@ const uploadToCloudinary = (
   });
 };
 
-const saveTrackAnalytics = async (trackId: string) => {
+const saveTrackAnalytics = async (trackId: string, waveform: number[]) => {
   await TrackAnalytics.create({
     trackId,
-    waveform: [],
+    waveform,
   });
 };
 
@@ -49,6 +50,8 @@ export const uploadTrack = async (req: any) => {
 
   const duration = await getAudioDuration(audioFile.buffer);
 
+  const waveform = await generateWaveform(audioFile.buffer);
+
   const track = await prisma.track.create({
     data: {
       title,
@@ -64,7 +67,7 @@ export const uploadTrack = async (req: any) => {
     },
   });
 
-  await saveTrackAnalytics(track.id);
+  await saveTrackAnalytics(track.id, waveform as number[]);
 
   return track;
 };
@@ -77,7 +80,22 @@ export const getAllTracks = async () => {
 
   if (!tracks) throw new Error("There is no uploaded tracks yet.");
 
-  return tracks;
+  const trackIds = tracks.map((t) => t.id);
+
+  const analytics = await TrackAnalytics.find({
+    trackId: { $in: trackIds },
+  });
+
+  const analyticsMap = new Map(analytics.map((a) => [a.trackId, a]));
+
+  const mergedTracks = tracks.map((track) => ({
+    ...track,
+    waveform: analyticsMap.get(track.id)?.waveform || [],
+    likes: analyticsMap.get(track.id)?.likes || 0,
+    plays: analyticsMap.get(track.id)?.plays || 0,
+  }));
+
+  return mergedTracks;
 };
 
 export const getSingleTrack = async (trackID: string) => {
@@ -103,7 +121,20 @@ export const getUsersTracks = async (username: string) => {
 
   if (!user) throw new Error("User not found.");
 
-  return user.tracks;
+  const trackIds = user.tracks.map((t) => t.id);
+
+  const analytics = await TrackAnalytics.find({
+    trackId: { $in: trackIds },
+  });
+
+  const analyticsMap = new Map(analytics.map((a) => [a.trackId, a]));
+
+  return user.tracks.map((track) => ({
+    ...track,
+    waveform: analyticsMap.get(track.id)?.waveform || [],
+    likes: analyticsMap.get(track.id)?.likes || 0,
+    plays: analyticsMap.get(track.id)?.plays || 0,
+  }));
 };
 
 export const deleteTrack = async (trackID: string) => {

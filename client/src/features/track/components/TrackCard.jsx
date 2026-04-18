@@ -13,6 +13,9 @@ export default function TrackCard({ track, loggedUser, onDelete }) {
         onDelete(track.id);
     }
 
+    console.log(track.waveform);
+
+
     return (
         <div className="w-full h-80 flex flex-col gap-3 bg-mybg2 rounded-md p-3">
             <div className="w-full h-1/2 flex gap-2">
@@ -72,8 +75,21 @@ export default function TrackCard({ track, loggedUser, onDelete }) {
                 </div>
             </div>
 
-            <div className="w-full h-1/2 bg-mybg flex justify-center items-center rounded-lg">
-                div for soundwaves
+            <div className="w-full h-1/2 flex justify-center items-center rounded-lg">
+                <div className="w-full h-full flex items-center gap-px px-2 rounded-lg overflow-hidden">
+                    {track.waveform?.length > 0 &&
+                        track.waveform.map((v, i) => (
+                            <div
+                                key={i}
+                                className="bg-mylight opacity-80"
+                                style={{
+                                    height: `${v * 100}px`,
+                                    width: "2px",
+                                    minHeight: "2px",
+                                }}
+                            />
+                        ))}
+                </div>
             </div>
         </div>
     );
