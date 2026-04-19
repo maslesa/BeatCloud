@@ -47,3 +47,23 @@ export const uploadTrack = async (formData, setProgress) => {
         throw error.response?.data || error;
     }
 };
+
+export const updateTrack = async (trackID, formData, setProgress) => {
+    try {
+        const res = await api.put(`/track/${trackID}`, formData, {
+            headers: { 'Content-Type': 'multipart/formdata' },
+            onUploadProgress: (progressEvent) => {
+                if (!progressEvent.total) return;
+                const rawPercent = Math.round((progressEvent.loaded * 100) / progressEvent);
+                if (setProgress) setProgress(rawPercent >= 100 ? 95 : rawPercent);
+            }
+        });
+
+        if (setProgress) setProgress(100);
+
+        return res.data;
+    } catch (error) {
+        if (setProgress) setProgress(0);
+        throw error.response?.data || error;
+    }
+}

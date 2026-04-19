@@ -15,6 +15,7 @@ export default function Router() {
         <Route path="/home" element={<Home />} />
         <Route path="/profile/:username" element={<Profile />} />
         <Route path="/upload" element={<UploadTrackPage />} />
+        <Route path="/track/:trackID/update" element={<UploadTrackPage />} />
       </Route>
 
     </Routes>
