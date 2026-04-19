@@ -30,7 +30,7 @@ export const generateWaveform = (buffer: Buffer): Promise<number[]> => {
             samples.push(pcmBuffer.readInt16LE(i));
           }
 
-          const POINTS = 1000;
+          const POINTS = 500;
           const blockSize = Math.floor(samples.length / POINTS);
 
           const waveform: number[] = [];

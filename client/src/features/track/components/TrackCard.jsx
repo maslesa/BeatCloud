@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { downloadTrack } from '../api/track.api';
+import Waveform from './Waveform';
 
 export default function TrackCard({ track, loggedUser, onDelete }) {
     const navigate = useNavigate();
@@ -7,25 +8,27 @@ export default function TrackCard({ track, loggedUser, onDelete }) {
     const trackId = track.id;    
 
     const handleDeleteClick = () => {
-        const confirmed = window.confirm('Are you sure you want to delete this track?');
-        if (confirmed) {
-            onDelete(trackId);
-        }
+        onDelete(trackId);
     };
 
     const handleEditClick = () => {
         navigate(`/track/${trackId}/update`, { state: { track } });
     };
 
+    const handleTrackDetailsClick = () => {
+        navigate(`/track/${trackId}`, {state: {track}});
+    }
+
     const handleAuthorClick = () => {
         navigate(`/profile/${track.author?.username}`);
     };
 
     return (
-        <div className="w-full h-80 flex flex-col gap-3 bg-mybg2 rounded-md p-3">
+        <div className="w-full h-80 flex flex-col gap-3 bg-linear-to-r from-mybg2/30 to-mybg2/60 rounded-md p-3">
             <div className="w-full h-1/2 flex gap-2">
                 <img
-                    className="min-w-40 max-w-40 max-h-40 object-cover rounded-md"
+                    onClick={handleTrackDetailsClick}
+                    className="min-w-40 max-w-40 max-h-40 object-cover rounded-md cursor-pointer"
                     src={track.coverURL}
                     alt={track.title}
                 />
@@ -42,7 +45,7 @@ export default function TrackCard({ track, loggedUser, onDelete }) {
                             >
                                 {track.author?.username || "Unknown"}
                             </p>
-                            <p className="text-2xl cursor-default">{track.title}</p>
+                            <p onClick={handleTrackDetailsClick} className="text-2xl cursor-pointer">{track.title}</p>
                         </div>
                     </div>
 
@@ -91,7 +94,7 @@ export default function TrackCard({ track, loggedUser, onDelete }) {
                             <div className="flex p-2 px-3 h-10 bg-mybg items-center justify-center rounded-md text-sm">
                                 {track.trackType?.charAt(0) + track.trackType?.slice(1).toLowerCase()}
                             </div>
-                            <div className="flex p-2 px-3 h-10 bg-mybg items-center justify-center rounded-md text-sm">
+                            <div className="flex p-2 px-3 h-10 bg-mybg items-center justify-Acenter rounded-md text-sm">
                                 Key: G min
                             </div>
                         </div>
@@ -105,23 +108,7 @@ export default function TrackCard({ track, loggedUser, onDelete }) {
             </div>
 
             <div className="w-full h-1/2 flex justify-center items-center rounded-lg">
-                <div className="w-full h-4/5 flex items-center gap-px px-2 rounded-lg overflow-hidden">
-                    {track.waveform?.length > 0 ? (
-                        track.waveform.map((v, i) => (
-                            <div
-                                key={i}
-                                className="bg-mylight opacity-80 hover:opacity-100 transition-opacity"
-                                style={{
-                                    height: `${v * 100}%`,
-                                    width: "2px",
-                                    minHeight: "2px",
-                                }}
-                            />
-                        ))
-                    ) : (
-                        <div className="w-full h-0.5 bg-mylight/20"></div>
-                    )}
-                </div>
+                <Waveform track={track}/>
             </div>
         </div>
     );
