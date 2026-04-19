@@ -72,14 +72,14 @@ export default function TrackCard({ track, loggedUser, onDelete }) {
                                     <div
                                         onClick={handleDeleteClick}
                                         title="delete"
-                                        className="flex p-2 w-10 h-10 bg-mybg items-center justify-center rounded-md cursor-pointer hover:bg-red-900/30"
+                                        className="flex p-2 w-10 h-10 bg-mybg items-center justify-center rounded-md cursor-pointer hover:bg-mybg/80"
                                     >
                                         <img className="w-5" src="/icons/delete.png" alt="Delete" />
                                     </div>
                                     <div
                                         onClick={handleEditClick}
                                         title="edit"
-                                        className="flex p-2 w-10 h-10 bg-mybg items-center justify-center rounded-md cursor-pointer hover:bg-mylight/20"
+                                        className="flex p-2 w-10 h-10 bg-mybg items-center justify-center rounded-md cursor-pointer hover:bg-mybg/80"
                                     >
                                         <img className="w-5" src="/icons/edit.png" alt="Edit" />
                                     </div>

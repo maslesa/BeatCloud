@@ -150,6 +150,10 @@ export default function UploadTrackPage() {
                         <span className="text-md font-bold opacity-80 ">
                             {audio ? audio.name : "Original audio file (Keep existing)"}
                         </span>
+                        <label className="ml-auto text-sm bg-mybg2 hover:bg-mybg2/80 p-2 px-3 rounded cursor-pointer">
+                            Change
+                            <input className="hidden" type="file" accept="audio/*" onChange={handleAudioChange} />
+                        </label>
                     </div>
                 )}
             </div>
