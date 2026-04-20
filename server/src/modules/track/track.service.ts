@@ -72,7 +72,7 @@ export const uploadTrack = async (req: any) => {
   return track;
 };
 
-export const getAllTracks = async () => {
+export const getAllTracks = async (userID?: string) => {
   const tracks = await prisma.track.findMany({
     orderBy: { createdAt: "desc" },
     include: { author: true },
@@ -88,28 +88,75 @@ export const getAllTracks = async () => {
 
   const analyticsMap = new Map(analytics.map((a) => [a.trackId, a]));
 
+  let userLikes: any[] = [];
+
+  if (userID) {
+    userLikes = await prisma.like.findMany({
+      where: {
+        userID: userID,
+        trackID: { in: trackIds },
+      },
+    });
+  }
+
+  const likedSet = new Set(userLikes.map((l) => l.trackID));
+
   const mergedTracks = tracks.map((track) => ({
     ...track,
     waveform: analyticsMap.get(track.id)?.waveform || [],
     likes: analyticsMap.get(track.id)?.likes || 0,
     plays: analyticsMap.get(track.id)?.plays || 0,
+    isLiked: likedSet.has(track.id),
   }));
 
   return mergedTracks;
 };
 
-export const getSingleTrack = async (trackID: string) => {
+export const getSingleTrack = async (trackID: string, userID?: string) => {
   const track = await prisma.track.findUnique({
     where: { id: trackID },
-    include: { author: true },
+    include: {
+      author: true,
+      likes: {
+        take: 10,
+        include: {
+          user: {
+            select: {
+              id: true,
+              username: true,
+              profileImageURL: true,
+            },
+          },
+        },
+      },
+    },
   });
 
   if (!track) throw new Error("Track not found.");
 
-  return track;
+  let isLiked = false;
+
+  if (userID) {
+    const like = await prisma.like.findUnique({
+      where: {
+        userID_trackID: {
+          userID: userID,
+          trackID: trackID,
+        },
+      },
+    });
+
+    isLiked = !!like;
+  }
+
+  return {
+    ...track,
+    likedBy: track.likes.map((l) => l.user),
+    isLiked,
+  };
 };
 
-export const getUsersTracks = async (username: string) => {
+export const getUsersTracks = async (username: string, userID?: string) => {
   const user = await prisma.user.findUnique({
     where: { username },
     include: {
@@ -130,11 +177,25 @@ export const getUsersTracks = async (username: string) => {
 
   const analyticsMap = new Map(analytics.map((a) => [a.trackId, a]));
 
+  let userLikes: any[] = [];
+
+  if (userID) {
+    userLikes = await prisma.like.findMany({
+      where: {
+        userID: userID,
+        trackID: { in: trackIds },
+      },
+    });
+  }
+
+  const likedSet = new Set(userLikes.map((l) => l.trackID));
+
   return user.tracks.map((track) => ({
     ...track,
     waveform: analyticsMap.get(track.id)?.waveform || [],
     likes: analyticsMap.get(track.id)?.likes || 0,
     plays: analyticsMap.get(track.id)?.plays || 0,
+    isLiked: likedSet.has(track.id),
   }));
 };
 

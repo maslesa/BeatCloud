@@ -5,6 +5,7 @@ const TrackAnalyticsSchema = new mongoose.Schema({
   waveform: [Number],
   plays: { type: Number, default: 0 },
   likes: { type: Number, default: 0 },
+  comments: { type: Number, default: 0 },
 });
 
 export const TrackAnalytics = mongoose.model(

@@ -23,9 +23,12 @@ export const uploadTrack = async (req: Request, res: Response) => {
   }
 };
 
-export const getAllTracks = async (_req: Request, res: Response) => {
+export const getAllTracks = async (req: Request, res: Response) => {
   try {
-    const result = await trackService.getAllTracks();
+
+    const userId = (req as any).user?.userId;
+
+    const result = await trackService.getAllTracks(userId);
 
     res.status(200).json({
       message: "All tracks fetched successfully",
@@ -46,11 +49,12 @@ export const getAllTracks = async (_req: Request, res: Response) => {
 
 export const getSingleTrack = async (req: Request, res: Response) => {
   const trackID = req.params.trackID;
+  const userId = (req as any).user?.userId;
 
   if (!trackID) res.status(404).json({ message: "Track ID is required." });
 
   try {
-    const track = await trackService.getSingleTrack(trackID as string);
+    const track = await trackService.getSingleTrack(trackID as string, userId as string);
 
     res.status(200).json({
       message: "Track fetched successfully",
@@ -71,11 +75,12 @@ export const getSingleTrack = async (req: Request, res: Response) => {
 
 export const getUsersTracks = async (req: Request, res: Response) => {
   const username = req.params.username;
+  const userId = (req as any).user?.userId;
 
   if (!username) res.status(404).json({ message: "User ID is required." });
 
   try {
-    const usersTracks = await trackService.getUsersTracks(username as string);
+    const usersTracks = await trackService.getUsersTracks(username as string, userId as string);
 
     res.status(200).json({
       message: "User's tracks fetched successfully.",

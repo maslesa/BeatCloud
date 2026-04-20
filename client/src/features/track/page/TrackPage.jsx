@@ -25,7 +25,7 @@ export default function TrackPage() {
     };
 
     const handleAuthorClick = () => {
-        navigate(`/profile/${track.author?.username}`);
+        navigate(`/profile/${user?.username}`);
     };
 
     const handleDeleteClick = () => {
@@ -112,12 +112,12 @@ export default function TrackPage() {
                     </div>
                     <div className="flex gap-3">
                         <div title="like" className="flex gap-2 p-2 w-20 h-10 bg-mybg2 items-center justify-center rounded-md cursor-pointer hover:bg-mybg2/80">
-                            <img className="w-5" src="/icons/like.png" alt="Like" />
-                            <p>23</p>
+                            <img className="w-5" src={track.isLiked ? '/icons/liked.png' : '/icons/like.png'} alt="Like" />
+                            <p>{track.likes}</p>
                         </div>
                         <div title="comment" className="flex gap-2 p-2 w-20 h-10 bg-mybg2 items-center justify-center rounded-md cursor-pointer hover:bg-mybg2/80">
                             <img className="w-5" src="/icons/comment.png" alt="Comment" />
-                            <p>10</p>
+                            <p>0</p>
                         </div>
                         {track.isDownloadable && (
                             <div

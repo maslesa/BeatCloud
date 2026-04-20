@@ -3,6 +3,7 @@ import * as trackController from "./track.controller";
 import { upload } from "../../middleware/upload.middleware";
 import { authMiddleware } from "../../middleware/auth.middleware";
 import { authorizedMiddleware } from "../../middleware/authorized.middleware";
+import { optionalAuthMiddleware } from "../../middleware/optionalAuth.middleware";
 
 const router = Router();
 
@@ -15,9 +16,9 @@ router.post(
   ]),
   trackController.uploadTrack,
 );
-router.get("/all", trackController.getAllTracks);
-router.get("/:trackID", trackController.getSingleTrack);
-router.get("/user/:username", trackController.getUsersTracks);
+router.get("/all", optionalAuthMiddleware, trackController.getAllTracks);
+router.get("/:trackID", optionalAuthMiddleware, trackController.getSingleTrack);
+router.get("/user/:username", optionalAuthMiddleware, trackController.getUsersTracks);
 router.delete(
   "/:trackID",
   authMiddleware,

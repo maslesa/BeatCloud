@@ -37,6 +37,7 @@ model User {
 
   tracks        Track[]
   refreshTokens RefreshToken[]
+  likes         Like[]
 }
 
 model RefreshToken {
@@ -65,4 +66,16 @@ model Track {
 
   authorId String
   author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  likes    Like[]
+}
+
+model Like {
+  id      String @id @default(uuid())
+  userID  String
+  trackID String
+
+  user  User  @relation(fields: [userID], references: [id], onDelete: Cascade)
+  track Track @relation(fields: [trackID], references: [id], onDelete: Cascade)
+
+  @@unique([userID, trackID])
 }
