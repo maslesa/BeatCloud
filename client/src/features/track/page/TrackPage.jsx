@@ -80,12 +80,20 @@ export default function TrackPage() {
                                     <div className="flex p-2 px-3 h-10 bg-mybg items-center justify-center rounded-md text-sm">
                                         {track.trackType?.charAt(0) + track.trackType?.slice(1).toLowerCase()}
                                     </div>
-                                    <div className="flex p-2 px-3 h-10 bg-mybg items-center justify-center rounded-md text-sm">
-                                        Key: G min
-                                    </div>
-                                    <div className="flex p-2 px-3 h-10 bg-mybg items-center justify-center rounded-md text-sm">
-                                        Bpm: 130
-                                    </div>
+                                    {track.key && (
+                                        <div className="flex p-2 px-3 h-10 bg-mybg items-center justify-Acenter rounded-md text-sm">
+                                            Key: {track.key
+                                                .replaceAll("_", " ")
+                                                .toLowerCase()
+                                                .replace(/\b\w/g, (c) => c.toUpperCase())
+                                            }
+                                        </div>
+                                    )}
+                                    {track.bpm && (
+                                        <div className="flex p-2 px-3 h-10 bg-mybg items-center justify-Acenter rounded-md text-sm">
+                                            {track.bpm} bpm
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -149,21 +157,19 @@ export default function TrackPage() {
                     </div>
                 </div>
                 <div className="flex gap-5">
-                    {/* Div for comments */}
                     <div className="flex flex-col w-1/2 min-h-50">
                         <h2 className="font-bold text-md mb-3">Comments:</h2>
                         <div className="opacity-60">
                             No comments.
                         </div>
                     </div>
-                    {/* Div for desc */}
                     <div className="flex flex-col w-1/2 min-h-50">
                         <h2 className="font-bold text-md mb-3">Description:</h2>
                         <div className="w-full">
                             <p className={`text-sm text-mylight/90 whitespace-pre-line transition-all duration-300 ${!isExpanded ? 'line-clamp-3' : 'line-clamp-none'}`}>
                                 {track.description || "No description provided."}
                             </p>
-                            {hasDescription && track.description.length > 10 && (
+                            {hasDescription && track.description.length > 50 && (
                                 <button
                                     onClick={() => setIsExpanded(!isExpanded)}
                                     className="text-xs font-bold text-mylight opacity-50 hover:opacity-100 cursor-pointer transition-all"

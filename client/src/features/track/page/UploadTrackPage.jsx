@@ -3,11 +3,13 @@ import { uploadTrack, updateTrack } from "../api/track.api";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../auth/store/useAuthStore';
 import { useAlertStore } from '../../../shared/hooks/useAlertStore';
+import CustomDropdown from "../components/CustomDropdown";
+import { keyOptions, trackTypeOptions } from "../constants/trackOptions";
 
 export default function UploadTrackPage() {
     const navigate = useNavigate();
     const location = useLocation();
-    
+
     const editTrack = location.state?.track || null;
     const isEditMode = !!editTrack;
 
@@ -17,6 +19,8 @@ export default function UploadTrackPage() {
     const [description, setDescription] = useState(editTrack?.description || "");
     const [trackType, setTrackType] = useState(editTrack?.trackType || "SONG");
     const [isDownloadable, setIsDownloadable] = useState(editTrack?.isDownloadable || false);
+    const [bpm, setBpm] = useState(editTrack?.bpm || "");
+    const [key, setKey] = useState(editTrack?.key || "");
 
     const [preview, setPreview] = useState(editTrack?.coverURL || null);
     const [progress, setProgress] = useState(0);
@@ -44,14 +48,16 @@ export default function UploadTrackPage() {
 
         setIsLoading(true);
         const formData = new FormData();
-        
+
         if (audio) formData.append("audio", audio);
         if (cover) formData.append("cover", cover);
-        
+
         formData.append("title", title);
         formData.append("description", description);
         formData.append("trackType", trackType);
         formData.append("isDownloadable", isDownloadable);
+        if (bpm) formData.append("bpm", bpm);
+        if (key) formData.append("key", key);
 
         try {
             if (isEditMode) {
@@ -115,17 +121,32 @@ export default function UploadTrackPage() {
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                     />
-                    <select
-                        value={trackType}
-                        onChange={(e) => setTrackType(e.target.value)}
-                        className="p-2 border-2 border-mylight outline-0 rounded-md bg-mybg cursor-pointer"
-                    >
-                        <option value="SONG">Song</option>
-                        <option value="LOOP">Loop</option>
-                        <option value="SAMPLE">Sample</option>
-                        <option value="BEAT">Beat</option>
-                        <option value="ACAPELLA">Acapella</option>
-                    </select>
+                    <div className="flex justify-between gap-3">
+                        <CustomDropdown
+                            options={trackTypeOptions}
+                            value={trackType}
+                            onChange={setTrackType}
+                            className="w-1/3"
+                        />
+                        <CustomDropdown
+                            options={keyOptions}
+                            value={key}
+                            onChange={setKey}
+                            className="w-1/3"
+                        />
+                        <input
+                            type="text"
+                            placeholder="BPM (optional)"
+                            className="w-1/3 p-2 border-2 border-mylight outline-0 rounded-md bg-transparent"
+                            value={bpm}
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                if (/^\d*$/.test(value)) {
+                                    setBpm(value);
+                                }
+                            }}
+                        />
+                    </div>
                     <label className="flex items-center gap-2 cursor-pointer">
                         <input
                             type="checkbox"

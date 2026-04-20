@@ -5,7 +5,7 @@ import Waveform from './Waveform';
 export default function TrackCard({ track, loggedUser, onDelete }) {
     const navigate = useNavigate();
 
-    const trackId = track.id;    
+    const trackId = track.id;
 
     const handleDeleteClick = () => {
         onDelete(trackId);
@@ -16,7 +16,7 @@ export default function TrackCard({ track, loggedUser, onDelete }) {
     };
 
     const handleTrackDetailsClick = () => {
-        navigate(`/track/${trackId}`, {state: {track}});
+        navigate(`/track/${trackId}`, { state: { track } });
     }
 
     const handleAuthorClick = () => {
@@ -94,9 +94,20 @@ export default function TrackCard({ track, loggedUser, onDelete }) {
                             <div className="flex p-2 px-3 h-10 bg-mybg items-center justify-center rounded-md text-sm">
                                 {track.trackType?.charAt(0) + track.trackType?.slice(1).toLowerCase()}
                             </div>
-                            <div className="flex p-2 px-3 h-10 bg-mybg items-center justify-Acenter rounded-md text-sm">
-                                Key: G min
-                            </div>
+                            {track.key && (
+                                <div className="flex p-2 px-3 h-10 bg-mybg items-center justify-Acenter rounded-md text-sm">
+                                    Key: {track.key
+                                        .replaceAll("_", " ")
+                                        .toLowerCase()
+                                        .replace(/\b\w/g, (c) => c.toUpperCase())
+                                    }
+                                </div>
+                            )}
+                            {track.bpm && (
+                                <div className="flex p-2 px-3 h-10 bg-mybg items-center justify-Acenter rounded-md text-sm">
+                                    {track.bpm} bpm
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -108,7 +119,7 @@ export default function TrackCard({ track, loggedUser, onDelete }) {
             </div>
 
             <div className="w-full h-1/2 flex justify-center items-center rounded-lg">
-                <Waveform track={track}/>
+                <Waveform track={track} />
             </div>
         </div>
     );

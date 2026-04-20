@@ -36,7 +36,7 @@ const deleteTrackAnalytics = async (trackId: string) => {
 };
 
 export const uploadTrack = async (req: any) => {
-  const { title, description, isDownloadable, trackType } = req.body;
+  const { title, description, isDownloadable, trackType, bpm, key } = req.body;
   const userId = (req as any).userId;
 
   const audioFile = req.files?.audio?.[0];
@@ -44,6 +44,16 @@ export const uploadTrack = async (req: any) => {
 
   if (!audioFile || !coverFile || !title || !trackType)
     throw new Error("Audio file, track title and track type are required.");
+
+  let parsedBPM: number | undefined = undefined;
+  if (bpm) {
+    parsedBPM = parseInt(bpm);
+    if (isNaN(parsedBPM)) throw new Error("BPM must be number.");
+  }
+
+  if (parsedBPM && (parsedBPM < 40 || parsedBPM > 250)) {
+    throw new Error("BPM must be between 40 and 250.");
+  }
 
   const audioUpload = await uploadToCloudinary(audioFile.buffer, "video");
   const coverUpload = await uploadToCloudinary(coverFile.buffer, "image");
@@ -58,6 +68,8 @@ export const uploadTrack = async (req: any) => {
       description,
       isDownloadable: isDownloadable === "true",
       trackType: trackType.toUpperCase(),
+      bpm: parsedBPM,
+      key: key || undefined,
       audioURL: audioUpload.secure_url,
       coverURL: coverUpload.secure_url,
       audioPublicID: audioUpload.public_id,
