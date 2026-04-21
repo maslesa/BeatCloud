@@ -10,6 +10,12 @@ export const getUserTracks = async (username) => {
     return res.data;
 }
 
+export const getSingleTrack = async(trackID) => {
+    //console.log(trackID);
+    const res = await api.get(`/track/${trackID}`);
+    return res.data;
+}
+
 export const deleteTrack = async (trackID) => {
     const res = await api.delete(`/track/${trackID}`);
     return res.data;
@@ -66,4 +72,9 @@ export const updateTrack = async (trackID, formData, setProgress) => {
         if (setProgress) setProgress(0);
         throw error.response?.data || error;
     }
+}
+
+export const likeTrack = async (trackID) => {
+    const res = await api.post(`/like/${trackID}`);
+    return res.data;
 }

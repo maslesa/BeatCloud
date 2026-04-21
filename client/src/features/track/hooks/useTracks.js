@@ -7,8 +7,6 @@ export const useTracks = () => {
     const [tracks, setTracks] = useState([]);
     
     const token = useAuthStore((state) => state.accessToken);
-    
-    console.log(token);
 
     const showAlert = useAlertStore((state) => state.showAlert);
 

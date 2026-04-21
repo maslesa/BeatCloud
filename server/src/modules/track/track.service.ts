@@ -130,7 +130,6 @@ export const getSingleTrack = async (trackID: string, userID?: string) => {
     include: {
       author: true,
       likes: {
-        take: 10,
         include: {
           user: {
             select: {
@@ -146,14 +145,18 @@ export const getSingleTrack = async (trackID: string, userID?: string) => {
 
   if (!track) throw new Error("Track not found.");
 
+  const analytics = await TrackAnalytics.findOne({
+    trackId: trackID,
+  });
+
   let isLiked = false;
 
   if (userID) {
     const like = await prisma.like.findUnique({
       where: {
         userID_trackID: {
-          userID: userID,
-          trackID: trackID,
+          userID,
+          trackID,
         },
       },
     });
@@ -163,8 +166,11 @@ export const getSingleTrack = async (trackID: string, userID?: string) => {
 
   return {
     ...track,
+    waveform: analytics?.waveform || [],
+    likesCount: track.likes.length,
     likedBy: track.likes.map((l) => l.user),
     isLiked,
+    plays: analytics?.plays || 0,
   };
 };
 

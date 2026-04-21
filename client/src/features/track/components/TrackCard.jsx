@@ -1,11 +1,19 @@
 import { useNavigate } from 'react-router-dom';
-import { downloadTrack } from '../api/track.api';
+import { downloadTrack, likeTrack } from '../api/track.api';
 import Waveform from './Waveform';
+import { useEffect, useState } from 'react';
 
 export default function TrackCard({ track, loggedUser, onDelete }) {
     const navigate = useNavigate();
 
     const trackId = track.id;
+    const [liked, setLiked] = useState(track.isLiked);
+    const [likes, setLikes] = useState(track.likes);
+
+    useEffect(() => {
+        setLiked(track.isLiked);
+        setLikes(track.likes);
+    }, [track.isLiked, track.likes]);
 
     const handleDeleteClick = () => {
         onDelete(trackId);
@@ -22,6 +30,20 @@ export default function TrackCard({ track, loggedUser, onDelete }) {
     const handleAuthorClick = () => {
         navigate(`/profile/${track.author?.username}`);
     };
+
+    const handleLike = async () => {
+        const prevLiked = liked;
+
+        setLiked(!prevLiked);
+        setLikes(prev => prevLiked ? prev - 1 : prev + 1);
+
+        try {
+            await likeTrack(trackId);
+        } catch (error) {
+            setLiked(prevLiked);
+            setLikes(prev => prevLiked ? prev + 1 : prev - 1);
+        }
+    }
 
     return (
         <div className="w-full h-80 flex flex-col gap-3 bg-linear-to-r from-mybg2/30 to-mybg2/60 rounded-md p-3">
@@ -51,9 +73,9 @@ export default function TrackCard({ track, loggedUser, onDelete }) {
 
                     <div className="flex w-full h-1/4 px-3 items-center justify-between">
                         <div className="flex gap-2 w-1/2 h-full items-center">
-                            <div title="like" className="flex gap-2 p-2 w-20 h-10 bg-mybg items-center justify-center rounded-md cursor-pointer hover:bg-mybg/80">
-                                <img className="w-5" src={track.isLiked ? '/icons/liked.png' : '/icons/like.png'} alt="Like" />
-                                <p>{track.likes}</p>
+                            <div onClick={handleLike} title={!liked ? 'like' : 'unlike'} className="flex gap-2 p-2 w-20 h-10 bg-mybg items-center justify-center rounded-md cursor-pointer hover:bg-mybg/80">
+                                <img className="w-5" src={liked ? '/icons/liked.png' : '/icons/like.png'} alt="Like" />
+                                <p>{likes}</p>
                             </div>
                             <div title="comment" className="flex gap-2 p-2 w-20 h-10 bg-mybg items-center justify-center rounded-md cursor-pointer hover:bg-mybg/80">
                                 <img className="w-5" src="/icons/comment.png" alt="Comment" />
