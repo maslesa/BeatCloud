@@ -1,11 +1,31 @@
-import 'dotenv/config';
+import "dotenv/config";
 import app from "./app";
-import { connectToMongoDB } from './config/mongo';
+import { connectToMongoDB } from "./config/mongo";
+import { Server } from "socket.io";
+import http from "http";
+
+const server = http.createServer(app);
 
 const PORT = process.env.PORT || 3000;
 
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log("User connected: ", socket.id);
+
+  socket.on("join", (userId) => {
+    socket.join(userId);
+  });
+});
+
+export { io };
+
 connectToMongoDB();
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port:${PORT}`);
-})
+server.listen(PORT, () => {
+  console.log(`Server is running on port: ${PORT}`);
+});

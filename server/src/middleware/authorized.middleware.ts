@@ -21,7 +21,7 @@ export const authorizedMiddleware = async (
     if (track.authorId !== userId)
       return res
         .status(403)
-        .json({ message: "You are not allowed to delete this track." });
+        .json({ message: "You are not allowed to delete/change this track." });
 
     next();
   } catch (error) {

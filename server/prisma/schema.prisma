@@ -66,6 +66,9 @@ model User {
   tracks        Track[]
   refreshTokens RefreshToken[]
   likes         Like[]
+
+  notifications Notification[]
+  notificationsFrom Notification[] @relation("Sender")
 }
 
 model RefreshToken {
@@ -97,6 +100,8 @@ model Track {
   authorId String
   author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
   likes    Like[]
+
+  notifications Notification[]
 }
 
 model Like {
@@ -108,4 +113,23 @@ model Like {
   track Track @relation(fields: [trackID], references: [id], onDelete: Cascade)
 
   @@unique([userID, trackID])
+}
+
+model Notification {
+  id String @id @default(uuid())
+  type String
+
+  message String
+  
+  userID String
+  user User @relation(fields: [userID], references: [id], onDelete: Cascade)
+
+  senderID String
+  sender User @relation("Sender", fields: [senderID], references: [id], onDelete: Cascade)
+
+  trackID String
+  track Track @relation(fields: [trackID], references: [id], onDelete: Cascade)
+
+  isRead Boolean
+  createdAt DateTime @default(now())
 }

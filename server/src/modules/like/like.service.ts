@@ -1,7 +1,15 @@
 import { prisma } from "../../config/db";
 import { TrackAnalytics } from "../../models/TrackAnalitycs";
+import { io } from "../../server";
 
 export const toggleLike = async (userID: string, trackID: string) => {
+  const track = await prisma.track.findUnique({
+    where: { id: trackID },
+    include: { author: true },
+  });
+
+  if (!track) throw new Error("Track not found");
+
   const existingLike = await prisma.like.findUnique({
     where: {
       userID_trackID: {
@@ -22,6 +30,15 @@ export const toggleLike = async (userID: string, trackID: string) => {
       { new: true, upsert: true },
     );
 
+    await prisma.notification.deleteMany({
+      where: {
+        userID: track.authorId,
+        senderID: userID,
+        trackID: trackID,
+        type: "LIKE",
+      },
+    });
+
     return { liked: false };
   }
 
@@ -37,6 +54,21 @@ export const toggleLike = async (userID: string, trackID: string) => {
     { $inc: { likes: 1 } },
     { new: true, upsert: true },
   );
+
+  if (track.authorId !== userID) {
+    const notification = await prisma.notification.create({
+      data: {
+        type: "LIKE",
+        message: `liked your track "${track.title}"`,
+        userID: track.authorId,
+        senderID: userID,
+        trackID: trackID,
+        isRead: false,
+      },
+    });
+
+    io.to(track.authorId).emit("notification", notification);
+  }
 
   return { liked: true };
 };
