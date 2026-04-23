@@ -10,8 +10,7 @@ export const getUserTracks = async (username) => {
     return res.data;
 }
 
-export const getSingleTrack = async(trackID) => {
-    //console.log(trackID);
+export const getSingleTrack = async (trackID) => {
     const res = await api.get(`/track/${trackID}`);
     return res.data;
 }

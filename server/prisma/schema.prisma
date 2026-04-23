@@ -69,6 +69,8 @@ model User {
 
   notifications Notification[]
   notificationsFrom Notification[] @relation("Sender")
+
+  comments Comment[]
 }
 
 model RefreshToken {
@@ -102,6 +104,8 @@ model Track {
   likes    Like[]
 
   notifications Notification[]
+
+  comments Comment[]
 }
 
 model Like {
@@ -132,4 +136,16 @@ model Notification {
 
   isRead Boolean
   createdAt DateTime @default(now())
+}
+
+model Comment {
+  id String @id @default(uuid())
+  content String
+  createdAt DateTime @default(now())
+
+  userID String
+  user User @relation(fields: [userID], references: [id], onDelete: Cascade)
+
+  trackID String
+  track Track @relation(fields: [trackID], references: [id], onDelete: Cascade)
 }

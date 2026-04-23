@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import ConfirmModal from "../../../shared/components/ConfirmModal";
 import { useAlertStore } from '../../../shared/hooks/useAlertStore';
 import { deleteTrack, getSingleTrack, likeTrack } from "../api/track.api";
+import { getComments, postComment } from '../../comment/api/comment.api';
 
 export default function TrackPage() {
     const { trackID } = useParams();
@@ -16,9 +17,24 @@ export default function TrackPage() {
     const [likes, setLikes] = useState(track?.likesCount || 0);
     const [isExpanded, setIsExpanded] = useState(false);
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const [comments, setComments] = useState([]);
+    const [commentInput, setCommentInput] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const user = useAuthStore((state) => state.user);
     const showAlert = useAlertStore((state) => state.showAlert);
+
+    useEffect(() => {
+        const fetchComments = async () => {
+            try {
+                const data = await getComments(trackId);
+                setComments(data.comments);
+            } catch (error) {
+                showAlert(error.response?.data?.message || error.message, "error");
+            }
+        }
+        fetchComments();
+    }, [trackId]);
 
     useEffect(() => {
         const fetchTrack = async () => {
@@ -36,9 +52,6 @@ export default function TrackPage() {
 
         fetchTrack();
     }, [trackId]);
-
-    console.log(track);
-    
 
     if (!track) return <div className="w-full h-20 flex items-center justify-center font-bold opacity-60">Track not found</div>;
 
@@ -81,6 +94,22 @@ export default function TrackPage() {
             setLikes(prev => prevLiked ? prev + 1 : prev - 1);
         }
     };
+
+    const handleAddComment = async () => {
+        if (!commentInput.trim() || isSubmitting) return;
+
+        try {
+            setIsSubmitting(true);
+            const data = await postComment(trackId, commentInput);
+
+            setComments(prev => [data.comment, ...prev]);
+            setCommentInput('');
+        } catch (error) {
+            showAlert(error.response?.data?.message || error.message, "error");
+        } finally {
+            setIsSubmitting(false);
+        }
+    }
 
     return (
         <>
@@ -151,8 +180,14 @@ export default function TrackPage() {
                 <div className="w-full h-10 flex justify-between">
                     <div className="w-4/5 h-full flex gap-3">
                         <img onClick={handleAuthorClick} className="rounded-full cursor-pointer hover:opacity-80 duration-200" src={user?.profileImageURL || "/icons/default-avatar.png"} alt="" />
-                        <input className="w-1/2 h-full bg-mybg2 px-3 text-sm rounded-md outline-0" placeholder="Write a comment..." type="text" />
-                        <button className="flex items-center justify-center opacity-60 cursor-pointer hover:opacity-100 duration-200">
+                        <input
+                            className="w-1/2 h-full bg-mybg2 px-3 text-sm rounded-md outline-0"
+                            placeholder="Write a comment..."
+                            type="text"
+                            value={commentInput}
+                            onChange={(e) => setCommentInput(e.target.value)}
+                        />
+                        <button onClick={handleAddComment} disabled={isSubmitting} className="flex items-center justify-center opacity-60 cursor-pointer hover:opacity-100 duration-200">
                             <img className="w-5" src="/icons/send.png" alt="" />
                         </button>
                     </div>
@@ -160,10 +195,6 @@ export default function TrackPage() {
                         <div onClick={handleLike} title={!liked ? 'like' : 'unlike'} className="flex gap-2 p-2 w-20 h-10 bg-mybg2 items-center justify-center rounded-md cursor-pointer hover:bg-mybg2/80">
                             <img className="w-5" src={liked ? '/icons/liked.png' : '/icons/like.png'} alt="Like" />
                             <p>{likes}</p>
-                        </div>
-                        <div title="comment" className="flex gap-2 p-2 w-20 h-10 bg-mybg2 items-center justify-center rounded-md cursor-pointer hover:bg-mybg2/80">
-                            <img className="w-5" src="/icons/comment.png" alt="Comment" />
-                            <p>0</p>
                         </div>
                         {track.isDownloadable && (
                             <div
@@ -194,11 +225,30 @@ export default function TrackPage() {
                         )}
                     </div>
                 </div>
-                <div className="flex gap-5">
-                    <div className="flex flex-col w-1/2 min-h-50">
-                        <h2 className="font-bold text-md mb-3">Comments:</h2>
-                        <div className="opacity-60">
-                            No comments.
+                <div className="flex gap-5 mb-10">
+                    <div className="flex flex-col w-1/2 min-h-50 gap-4">
+                        <h2 className="font-bold text-md mb-1">Comments ({comments.length}):</h2>
+                        <div className="flex flex-col gap-4 max-h-100 overflow-y-auto pr-2 custom-scrollbar">
+                            {comments.length > 0 ? (
+                                comments.map((c) => (
+                                    <div key={c.id} className="flex items-center gap-3 animate-in fade-in duration-500">
+                                        <img
+                                            className="w-10 h-10 rounded-full object-cover shrink-0"
+                                            src={c.user?.profileImageURL || "/icons/default-avatar.png"}
+                                            alt=""
+                                        />
+                                        <div className="flex flex-col bg-mybg2/30 p-3 rounded-lg w-full">
+                                            <div className="flex justify-between items-center mb-1">
+                                                <span className="text-xs font-bold text-mylight">{c.user?.username}</span>
+                                                <span className="text-xs opacity-40">{new Date(c.createdAt).toLocaleDateString()}</span>
+                                            </div>
+                                            <p className="text-sm opacity-80 leading-relaxed">{c.content}</p>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="opacity-40 text-sm">No comments yet. Be the first to comment!</div>
+                            )}
                         </div>
                     </div>
                     <div className="flex flex-col w-1/2 min-h-50">

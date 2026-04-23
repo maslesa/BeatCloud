@@ -79,7 +79,7 @@ export default function TrackCard({ track, loggedUser, onDelete }) {
                             </div>
                             <div title="comment" className="flex gap-2 p-2 w-20 h-10 bg-mybg items-center justify-center rounded-md cursor-pointer hover:bg-mybg/80">
                                 <img className="w-5" src="/icons/comment.png" alt="Comment" />
-                                <p>0</p>
+                                <p>{track.comments}</p>
                             </div>
 
                             {track.isDownloadable && (

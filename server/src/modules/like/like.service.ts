@@ -65,6 +65,10 @@ export const toggleLike = async (userID: string, trackID: string) => {
         trackID: trackID,
         isRead: false,
       },
+      include: {
+        sender: { select: { username: true, profileImageURL: true } },
+        track: { select: { coverURL: true } },
+      },
     });
 
     io.to(track.authorId).emit("notification", notification);

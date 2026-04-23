@@ -118,6 +118,7 @@ export const getAllTracks = async (userID?: string) => {
     waveform: analyticsMap.get(track.id)?.waveform || [],
     likes: analyticsMap.get(track.id)?.likes || 0,
     plays: analyticsMap.get(track.id)?.plays || 0,
+    comments: analyticsMap.get(track.id)?.comments || 0,
     isLiked: likedSet.has(track.id),
   }));
 
@@ -168,6 +169,7 @@ export const getSingleTrack = async (trackID: string, userID?: string) => {
     ...track,
     waveform: analytics?.waveform || [],
     likesCount: track.likes.length,
+    comments: analytics?.comments,
     likedBy: track.likes.map((l) => l.user),
     isLiked,
     plays: analytics?.plays || 0,
@@ -213,6 +215,7 @@ export const getUsersTracks = async (username: string, userID?: string) => {
     waveform: analyticsMap.get(track.id)?.waveform || [],
     likes: analyticsMap.get(track.id)?.likes || 0,
     plays: analyticsMap.get(track.id)?.plays || 0,
+    comments: analyticsMap.get(track.id)?.comments || 0,
     isLiked: likedSet.has(track.id),
   }));
 };
