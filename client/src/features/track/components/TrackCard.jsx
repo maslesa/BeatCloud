@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { downloadTrack, likeTrack } from '../api/track.api';
 import Waveform from './Waveform';
 import { useEffect, useState } from 'react';
+import { usePlayerStore } from '../hooks/usePlayerStore';
 
 export default function TrackCard({ track, loggedUser, onDelete }) {
     const navigate = useNavigate();
@@ -10,10 +11,17 @@ export default function TrackCard({ track, loggedUser, onDelete }) {
     const [liked, setLiked] = useState(track.isLiked);
     const [likes, setLikes] = useState(track.likes);
 
+    const { playTrack, currentTrackId, isPlaying } = usePlayerStore();
+    const isThisPlaying = currentTrackId === track.id && isPlaying;
+
     useEffect(() => {
         setLiked(track.isLiked);
         setLikes(track.likes);
     }, [track.isLiked, track.likes]);
+
+    useEffect(() => {
+        return () => usePlayerStore.getState().stopAll();
+    }, []);
 
     const handleDeleteClick = () => {
         onDelete(trackId);
@@ -57,8 +65,8 @@ export default function TrackCard({ track, loggedUser, onDelete }) {
 
                 <div className="w-full h-full relative">
                     <div className="w-full h-3/4 flex items-center justify-baseline p-3 gap-3">
-                        <button className="cursor-pointer hover:scale-105 duration-200">
-                            <img className="w-20" src="/icons/play.png" alt="Play" />
+                        <button onClick={() => playTrack(track)} className="cursor-pointer hover:scale-105 duration-200">
+                            <img className="w-20" src={isThisPlaying ? "/icons/pause.png" : "/icons/play.png"} alt="Play" />
                         </button>
                         <div className="flex flex-col items-baseline gap-1 font-bold text-mylight">
                             <p

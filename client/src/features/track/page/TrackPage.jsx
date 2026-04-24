@@ -6,6 +6,7 @@ import ConfirmModal from "../../../shared/components/ConfirmModal";
 import { useAlertStore } from '../../../shared/hooks/useAlertStore';
 import { deleteTrack, getSingleTrack, likeTrack } from "../api/track.api";
 import { getComments, postComment } from '../../comment/api/comment.api';
+import { usePlayerStore } from '../hooks/usePlayerStore';
 
 export default function TrackPage() {
     const { trackID } = useParams();
@@ -23,6 +24,12 @@ export default function TrackPage() {
 
     const user = useAuthStore((state) => state.user);
     const showAlert = useAlertStore((state) => state.showAlert);
+    const { playTrack, currentTrackId, isPlaying } = usePlayerStore();
+    const isThisPlaying = currentTrackId === track?.id && isPlaying;
+
+    useEffect(() => {
+        return () => usePlayerStore.getState().stopAll();
+    }, []);
 
     useEffect(() => {
         const fetchComments = async () => {
@@ -126,8 +133,8 @@ export default function TrackPage() {
 
                         <div className="w-full flex flex-col gap-5">
                             <div className='w-full flex gap-5'>
-                                <button className="cursor-pointer hover:opacity-80 duration-200">
-                                    <img className="w-16 md:w-20" src="/icons/play.png" alt="Play" />
+                                <button onClick={() => playTrack(track)} className="cursor-pointer hover:opacity-80 duration-200">
+                                    <img className="w-16 md:w-20" src={isThisPlaying ? "/icons/pause.png" : "/icons/play.png"} alt="Play" />
                                 </button>
                                 <div className='flex flex-col w-full'>
                                     <div className="flex w-full justify-between mb-1">
