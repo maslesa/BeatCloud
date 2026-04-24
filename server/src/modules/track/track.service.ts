@@ -315,3 +315,22 @@ export const downloadTrack = async (trackID: string) => {
 
   return track;
 };
+
+export const incrementTrackPlays = async (trackID: string, userID: string) => {
+  const track = await prisma.track.findUnique({
+    where: { id: trackID },
+    select: { authorId: true },
+  });
+
+  if (!track) throw new Error("Track not found");
+
+  if (userID !== track.authorId) {
+    await TrackAnalytics.findOneAndUpdate(
+      { trackId: trackID },
+      { $inc: { plays: 1 } },
+      { new: true, upsert: true },
+    );
+  }
+
+  return track;
+};

@@ -25,7 +25,6 @@ export const uploadTrack = async (req: Request, res: Response) => {
 
 export const getAllTracks = async (req: Request, res: Response) => {
   try {
-
     const userId = (req as any).user?.userId;
 
     const result = await trackService.getAllTracks(userId);
@@ -54,7 +53,10 @@ export const getSingleTrack = async (req: Request, res: Response) => {
   if (!trackID) res.status(404).json({ message: "Track ID is required." });
 
   try {
-    const track = await trackService.getSingleTrack(trackID as string, userId as string);
+    const track = await trackService.getSingleTrack(
+      trackID as string,
+      userId as string,
+    );
 
     res.status(200).json({
       message: "Track fetched successfully",
@@ -80,7 +82,10 @@ export const getUsersTracks = async (req: Request, res: Response) => {
   if (!username) res.status(404).json({ message: "User ID is required." });
 
   try {
-    const usersTracks = await trackService.getUsersTracks(username as string, userId as string);
+    const usersTracks = await trackService.getUsersTracks(
+      username as string,
+      userId as string,
+    );
 
     res.status(200).json({
       message: "User's tracks fetched successfully.",
@@ -162,6 +167,33 @@ export const downloadTrack = async (req: Request, res: Response) => {
     res.setHeader("Content-Type", "audio/wav");
 
     response.data.pipe(res);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({
+        message: error.message,
+      });
+    } else {
+      res.status(500).json({
+        message: "Internal server error.",
+      });
+    }
+  }
+};
+
+export const incrementTrackPlays = async (req: Request, res: Response) => {
+  try {
+    const { trackId } = req.params;
+    const user = (req as any).user;
+
+    const track = await trackService.incrementTrackPlays(
+      trackId as string,
+      user.id as string,
+    );
+
+    return res.status(200).json({
+      message: "Track plays incremented successfully",
+      track,
+    });
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).json({

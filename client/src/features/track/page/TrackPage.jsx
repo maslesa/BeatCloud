@@ -151,6 +151,10 @@ export default function TrackPage() {
                             </div>
                             <div className="w-full h-10 flex items-center justify-between">
                                 <div className="w-2/3 h-full flex gap-2">
+                                    <div title="Plays" className="flex gap-2 p-2 w-20 h-10 bg-mybg items-center justify-center rounded-md">
+                                        <img className="w-5" src="/icons/plays.png" alt="Plays" />
+                                        <p>{track.plays}</p>
+                                    </div>
                                     <div className="flex p-2 px-3 h-10 bg-mybg items-center justify-center rounded-md text-sm">
                                         {track.trackType?.charAt(0) + track.trackType?.slice(1).toLowerCase()}
                                     </div>

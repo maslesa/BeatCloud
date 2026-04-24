@@ -33,5 +33,6 @@ router.put(
   trackController.updateTrack,
 );
 router.get("/download/:trackID", trackController.downloadTrack);
+router.patch('/:trackId/play', optionalAuthMiddleware, trackController.incrementTrackPlays);
 
 export default router;

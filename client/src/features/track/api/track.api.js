@@ -77,3 +77,8 @@ export const likeTrack = async (trackID) => {
     const res = await api.post(`/like/${trackID}`);
     return res.data;
 }
+
+export const incrementTrackPlays = async(trackID) => {
+    const res = await api.patch(`/track/${trackID}/play`);
+    return res.data;
+}

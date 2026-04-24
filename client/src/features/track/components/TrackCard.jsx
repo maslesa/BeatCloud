@@ -121,6 +121,10 @@ export default function TrackCard({ track, loggedUser, onDelete }) {
                         </div>
 
                         <div className="flex gap-2 w-1/2 h-full justify-end">
+                            <div title="Plays" className="flex gap-2 p-2 w-20 h-10 bg-mybg items-center justify-center rounded-md">
+                                <img className="w-5" src="/icons/plays.png" alt="Plays" />
+                                <p>{track.plays}</p>
+                            </div>
                             <div className="flex p-2 px-3 h-10 bg-mybg items-center justify-center rounded-md text-sm">
                                 {track.trackType?.charAt(0) + track.trackType?.slice(1).toLowerCase()}
                             </div>
