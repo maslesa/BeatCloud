@@ -334,3 +334,36 @@ export const incrementTrackPlays = async (trackID: string, userID: string) => {
 
   return track;
 };
+
+export const searchTracks = async (filters: any) => {
+  const { q, trackType, key, bpm, isDownloadable } = filters;
+
+  const where: any = {
+    AND: [
+      q
+        ? {
+            OR: [
+              { title: { contains: q, mode: "insensitive" } },
+              { author: { username: { contains: q, mode: "insensitive" } } },
+            ],
+          }
+        : {},
+      trackType ? { trackType } : {},
+      key ? { key } : {},
+      bpm ? { bpm: parseInt(bpm) } : {},
+      isDownloadable !== undefined
+        ? { isDownloadable: isDownloadable === "true" }
+        : {},
+    ],
+  };
+
+  return await prisma.track.findMany({
+    where,
+    include: {
+      author: {
+        select: { username: true, profileImageURL: true },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+};

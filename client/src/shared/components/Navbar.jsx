@@ -6,6 +6,8 @@ import { logout as logoutAPI } from "../../features/auth/api/auth.api";
 import { useAlertStore } from "../../shared/hooks/useAlertStore";
 import { io } from 'socket.io-client';
 import { getRecentNotifications, markNotificationAsRead } from "../../features/notification/api/notification.api";
+import CustomDropdown from "../../features/track/components/CustomDropdown";
+import { trackTypeOptions, keyOptions } from '../../features/track/constants/trackOptions';
 
 export default function Navbar() {
 
@@ -20,6 +22,14 @@ export default function Navbar() {
   const [notifications, setNotifications] = useState([]);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const hasUnreadNotifications = notifications.some(n => !n.isRead);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filters, setFilters] = useState({
+    trackType: '',
+    key: '',
+    bpm: '',
+    isDownloadable: false,
+  });
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   const notificationRef = useRef();
   const triggerRef = useRef();
@@ -85,6 +95,22 @@ export default function Navbar() {
     }
   }
 
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    if (searchQuery) params.append("q", searchQuery);
+    if (filters.trackType) params.append("trackType", filters.trackType);
+    if (filters.key) params.append("key", filters.key);
+    if (filters.bpm) params.append("bpm", filters.bpm);
+    if (filters.isDownloadable) params.append("isDownloadable", "true");
+
+    navigate(`/search?${params.toString()}`);
+    setIsFiltersOpen(false);
+  }
+
+  const updateFilter = (name, value) => {
+    setFilters(prev => ({ ...prev, [name]: value }));
+  };
+
   return (
     <nav className="w-full flex items-center justify-between py-4 px-50 h-20 bg-mybg fixed top-0 left-0 z-9000">
 
@@ -92,10 +118,103 @@ export default function Navbar() {
         <img className="w-15" src="/icons/logo.png" alt="" />
       </Link>
 
-      <div className="flex justify-center items-center gap-3">
-        <input className="w-120 bg-mybg2 px-3 py-2.5 rounded-sm outline-0 text-smd" placeholder="Search..." type="text" />
-        <button className="flex items-center justify-center opacity-60 hover:opacity-100 cursor-pointer duration-200"><img className="w-5" src="/icons/filter.png" alt="" /></button>
-        <button className="flex items-center justify-center opacity-60 hover:opacity-100 cursor-pointer duration-200"><img className="w-5" src="/icons/search.png" alt="" /></button>
+      <div className="flex flex-col items-center relative">
+        <div className="flex justify-center items-center gap-3">
+          <input
+            className="w-120 bg-mybg2 px-4 py-2.5 rounded-sm outline-0 text-sm border border-transparent focus:border-mylight/30 duration-200 mr-2"
+            placeholder="Search tracks, artists, genres..."
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+          />
+          <button
+            onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+            className={`flex items-center justify-center cursor-pointer duration-200 rounded-md ${isFiltersOpen ? 'opacity-100' : 'opacity-60 hover:opacity-100'}`}
+          >
+            <img className="w-5" src="/icons/filter.png" alt="Filter" />
+          </button>
+          <button
+            onClick={handleSearch}
+            className="flex items-center justify-center opacity-60 hover:opacity-100 cursor-pointer duration-200 p-2"
+          >
+            <img className="w-5" src="/icons/search.png" alt="Search" />
+          </button>
+        </div>
+
+        {isFiltersOpen && (
+          <div className="absolute top-15 w-125 bg-mybg2 p-5 flex flex-col gap-5 rounded-md shadow-2xl animate-in fade-in slide-in-from-top-2 duration-200 z-10000">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <h3 className="font-bold text-lg text-mylight">Advanced filters</h3>
+              <button
+                onClick={() => setFilters({ trackType: '', key: '', bpm: '', isDownloadable: false })}
+                className="text-xs opacity-50 hover:opacity-100 cursor-pointer duration-150"
+              >
+                Reset all
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-2">
+                <label className="text-xs opacity-60 font-bold tracking-wider">Track Type</label>
+                <CustomDropdown
+                  options={[{value: '', label: 'All Types'}, ...trackTypeOptions]}
+                  value={filters.trackType}
+                  onChange={(val) => updateFilter('trackType', val)}
+                  className="w-full"
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-xs opacity-60 font-bold tracking-wider">Key</label>
+                <CustomDropdown
+                  options={keyOptions}
+                  value={filters.key}
+                  onChange={(val) => updateFilter('key', val)}
+                  className="w-full"
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-xs opacity-60 font-bold tracking-wider">BPM</label>
+                <input
+                  type="text"
+                  placeholder="e.g. 140"
+                  value={filters.bpm}
+                  onChange={(e) => {
+                                const value = e.target.value;
+                                if (/^\d*$/.test(value)) {
+                                    updateFilter('bpm', value);
+                                }
+                            }}
+                  className="bg-mybg border-2 border-mylight rounded-md p-2 text-sm outline-none focus:ring-1 ring-mylight/50"
+                />
+              </div>
+
+              <div className="flex items-end pb-1">
+                <label className="flex items-center gap-3 cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    className="hidden"
+                    checked={filters.isDownloadable}
+                    onChange={(e) => updateFilter('isDownloadable', e.target.checked)}
+                  />
+                  <div className={`w-5 h-5 border-2 border-mylight rounded flex items-center justify-center duration-200 ${filters.isDownloadable ? 'bg-mylight' : 'bg-transparent'}`}>
+                    {filters.isDownloadable && <span className="text-mybg text-xs">✔</span>}
+                  </div>
+                  <span className="text-sm opacity-80 group-hover:opacity-100">Downloadable</span>
+                </label>
+              </div>
+            </div>
+
+            <button
+              onClick={handleSearch}
+              className="w-full bg-mylight text-mybg font-bold py-3 rounded-md hover:brightness-110 duration-200 mt-2"
+            >
+              Apply filters & search
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="flex items-center gap-2">

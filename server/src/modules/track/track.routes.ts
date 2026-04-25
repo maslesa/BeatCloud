@@ -18,7 +18,11 @@ router.post(
 );
 router.get("/all", optionalAuthMiddleware, trackController.getAllTracks);
 router.get("/:trackID", optionalAuthMiddleware, trackController.getSingleTrack);
-router.get("/user/:username", optionalAuthMiddleware, trackController.getUsersTracks);
+router.get(
+  "/user/:username",
+  optionalAuthMiddleware,
+  trackController.getUsersTracks,
+);
 router.delete(
   "/:trackID",
   authMiddleware,
@@ -33,6 +37,11 @@ router.put(
   trackController.updateTrack,
 );
 router.get("/download/:trackID", trackController.downloadTrack);
-router.patch('/:trackId/play', optionalAuthMiddleware, trackController.incrementTrackPlays);
+router.patch(
+  "/:trackId/play",
+  optionalAuthMiddleware,
+  trackController.incrementTrackPlays,
+);
+router.get("/search", trackController.searchTracks);
 
 export default router;
