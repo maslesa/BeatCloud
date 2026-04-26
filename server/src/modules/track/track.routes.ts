@@ -17,6 +17,7 @@ router.post(
   trackController.uploadTrack,
 );
 router.get("/all", optionalAuthMiddleware, trackController.getAllTracks);
+router.get("/search", trackController.searchTracks);
 router.get("/:trackID", optionalAuthMiddleware, trackController.getSingleTrack);
 router.get(
   "/user/:username",
@@ -42,6 +43,5 @@ router.patch(
   optionalAuthMiddleware,
   trackController.incrementTrackPlays,
 );
-router.get("/search", trackController.searchTracks);
 
 export default router;

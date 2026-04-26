@@ -335,7 +335,7 @@ export const incrementTrackPlays = async (trackID: string, userID: string) => {
   return track;
 };
 
-export const searchTracks = async (filters: any) => {
+export const searchTracks = async (filters: any, userID?: string) => {
   const { q, trackType, key, bpm, isDownloadable } = filters;
 
   const where: any = {
@@ -357,7 +357,7 @@ export const searchTracks = async (filters: any) => {
     ],
   };
 
-  return await prisma.track.findMany({
+  const tracks = await prisma.track.findMany({
     where,
     include: {
       author: {
@@ -366,4 +366,37 @@ export const searchTracks = async (filters: any) => {
     },
     orderBy: { createdAt: "desc" },
   });
+
+  if (!tracks || tracks.length === 0) return [];
+
+  const trackIds = tracks.map((t) => t.id);
+
+  const analytics = await TrackAnalytics.find({
+    trackId: { $in: trackIds },
+  });
+
+  const analyticsMap = new Map(analytics.map((a) => [a.trackId, a]));
+
+  let userLikes: any[] = [];
+  if (userID) {
+    userLikes = await prisma.like.findMany({
+      where: {
+        userID: userID,
+        trackID: { in: trackIds },
+      },
+    });
+  }
+
+  const likedSet = new Set(userLikes.map((l) => l.trackID));
+
+  const mergedTracks = tracks.map((track) => ({
+    ...track,
+    waveform: analyticsMap.get(track.id)?.waveform || [],
+    likes: analyticsMap.get(track.id)?.likes || 0,
+    plays: analyticsMap.get(track.id)?.plays || 0,
+    comments: analyticsMap.get(track.id)?.comments || 0,
+    isLiked: likedSet.has(track.id),
+  }));
+
+  return mergedTracks;
 };

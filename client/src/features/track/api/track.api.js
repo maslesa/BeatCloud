@@ -82,3 +82,8 @@ export const incrementTrackPlays = async(trackID) => {
     const res = await api.patch(`/track/${trackID}/play`);
     return res.data;
 }
+
+export const searchTracks = async(queryParams) => {
+    const res = await api.get(`/track/search?${queryParams}`);
+    return res.data;
+}

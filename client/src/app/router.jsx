@@ -5,6 +5,7 @@ import Home from "../features/home/page/Home";
 import Profile from "../features/profile/page/Profile";
 import UploadTrackPage from "../features/track/page/UploadTrackPage";
 import TrackPage from "../features/track/page/TrackPage";
+import TrackSearch from "../features/track/page/TrackSearch";
 
 export default function Router() {
   return (
@@ -18,6 +19,7 @@ export default function Router() {
         <Route path="/upload" element={<UploadTrackPage />} />
         <Route path="/track/:trackID/update" element={<UploadTrackPage />} />
         <Route path="/track/:trackID" element={<TrackPage />} />
+        <Route path="/search" element={<TrackSearch />} />
       </Route>
 
     </Routes>
