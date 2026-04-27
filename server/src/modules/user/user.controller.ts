@@ -3,8 +3,9 @@ import * as userService from "./user.service";
 
 export const getUserByUsername = async (req: Request, res: Response) => {
   const { username } = req.params;
+  const currentUserId = (req as any).user?.userId;
   try {
-    const user = await userService.getUserByUsername(username as string);
+    const user = await userService.getUserByUsername(username as string, currentUserId);
 
     res.status(200).json({
       message: "User fetched successfully.",

@@ -1,16 +1,29 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 import { getUserByUsername } from "../api/user.api";
 import { useAlertStore } from '../../../shared/hooks/useAlertStore';
-
+import { useAuthStore } from "../../auth/store/useAuthStore";
 
 export const useUser = (username) => {
-    
     const [user, setUser] = useState(null);
-
+    const [isHydrated, setIsHydrated] = useState(false);
+    
+    const token = useAuthStore((state) => state.accessToken);
     const showAlert = useAlertStore((state) => state.showAlert);
 
     useEffect(() => {
-        if (!username) return null;
+        const unsubHydrate = useAuthStore.persist.onFinishHydration(() => {
+            setIsHydrated(true);
+        });
+
+        if (useAuthStore.persist.hasHydrated()) {
+            setIsHydrated(true);
+        }
+
+        return () => unsubHydrate();
+    }, []);
+
+    useEffect(() => {
+        if (!username || !isHydrated) return;
 
         const fetchUser = async () => {
             try {
@@ -23,7 +36,7 @@ export const useUser = (username) => {
 
         fetchUser();
 
-    }, [username]);
+    }, [username, token, isHydrated]);
 
-    return { user };
+    return { user, isHydrated };
 }

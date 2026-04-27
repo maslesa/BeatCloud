@@ -55,9 +55,6 @@ model User {
   passwordResetToken   String?
   passwordResetExpires DateTime?
 
-  twoFactorEnabled Boolean @default(false)
-  twoFactorSecret  String?
-
   googleId String? @unique
 
   createdAt DateTime @default(now())
@@ -71,7 +68,22 @@ model User {
   notificationsFrom Notification[] @relation("Sender")
 
   comments Comment[]
+
+  followers Follow[] @relation("following")
+  following Follow[] @relation("follower")
 }
+
+model Follow{
+  followerId String
+  followingId String
+  createdAt DateTime @default(now())
+
+  follower User @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@id([followerId, followingId])
+}
+
 
 model RefreshToken {
   id        String   @id @default(uuid())
@@ -131,8 +143,8 @@ model Notification {
   senderID String
   sender User @relation("Sender", fields: [senderID], references: [id], onDelete: Cascade)
 
-  trackID String
-  track Track @relation(fields: [trackID], references: [id], onDelete: Cascade)
+  trackID String?
+  track Track? @relation(fields: [trackID], references: [id], onDelete: Cascade)
 
   isRead Boolean
   createdAt DateTime @default(now())

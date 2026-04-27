@@ -1,6 +1,9 @@
 import { prisma } from "../../config/db";
 
-export const getUserByUsername = async (username: string) => {
+export const getUserByUsername = async (
+  username: string,
+  currentUserId?: string,
+) => {
   const user = await prisma.user.findUnique({
     where: { username },
     select: {
@@ -10,11 +13,31 @@ export const getUserByUsername = async (username: string) => {
       profileImageURL: true,
       isVerified: true,
       createdAt: true,
+      _count: {
+        select: {
+          followers: true,
+          following: true,
+          tracks: true,
+        },
+      },
     },
   });
 
-  if(!user) throw new Error('User not found.');
+  if (!user) throw new Error("User not found.");
 
-  return user;
+  let isFollowing = false;
 
+  if (currentUserId) {
+    const follow = await prisma.follow.findUnique({
+      where: {
+        followerId_followingId: {
+          followerId: currentUserId,
+          followingId: user.id,
+        },
+      },
+    });
+    isFollowing = !!follow;
+  }
+
+  return {...user, isFollowing};
 };

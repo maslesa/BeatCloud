@@ -9,7 +9,7 @@ export const optionalAuthMiddleware = async (
   try {
     const authHeader = req.headers.authorization;
 
-    if (!authHeader) {
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       next();
     } else {
       const token = authHeader.split(" ")[1];

@@ -37,7 +37,15 @@ export default function UserTracks() {
         <>
             <div className="mt-5">
                 <h1 className="text-2xl font-bold">Tracks</h1>
-                <TrackList tracks={tracks} onDelete={openConfirmModal} />
+                {tracks.length > 0 ?
+                    (
+                        <TrackList tracks={tracks} onDelete={openConfirmModal} />
+                    ) : (
+                        <div className="h-50 w-full flex flex-col gap-5 justify-center items-center">
+                            <img className="w-10 opacity-60" src="/icons/notfound.png" alt="" />
+                            <p className="opacity-60">User has no tracks yet.</p>
+                        </div>
+                    )}
             </div>
             <ConfirmModal
                 isOpen={isConfirmOpen}

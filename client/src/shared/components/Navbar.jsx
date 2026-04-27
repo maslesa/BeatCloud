@@ -256,7 +256,7 @@ export default function Navbar() {
                             <p><b>{n.sender?.username}</b> {n.message}</p>
                             <p className="opacity-60">{new Date(n.createdAt).toLocaleTimeString()}</p>
                           </div>
-                          <img className="min-w-12 max-w-12 min-h-12 max-h-12" src={n.track?.coverURL} alt="" />
+                          {n.track && (<img className="min-w-12 max-w-12 min-h-12 max-h-12" src={n.track?.coverURL} alt="" />)}
                         </div>
                       ))
                     ) : (
