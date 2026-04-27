@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import helmet from "helmet";
 import authRoutes from "./modules/auth/auth.routes";
 import trackRoutes from "./modules/track/track.routes";
 import userRoutes from "./modules/user/user.routes";
@@ -8,6 +9,7 @@ import notificationRoutes from "./modules/notification/notification.routes";
 import commentRoutes from "./modules/comment/comment.routes";
 import followRoutes from "./modules/follow/follow.routes";
 import cookieParser from "cookie-parser";
+import { generalLimiter } from "./middleware/rateLimiter";
 
 const app = express();
 
@@ -19,7 +21,8 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser());
-
+app.use(helmet());
+app.use('/api', generalLimiter);
 app.use("/api/auth", authRoutes);
 app.use("/api/track", trackRoutes);
 app.use("/api/user", userRoutes);

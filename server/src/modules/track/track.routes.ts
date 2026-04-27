@@ -4,11 +4,13 @@ import { upload } from "../../middleware/upload.middleware";
 import { authMiddleware } from "../../middleware/auth.middleware";
 import { authorizedMiddleware } from "../../middleware/authorized.middleware";
 import { optionalAuthMiddleware } from "../../middleware/optionalAuth.middleware";
+import { uploadTrackLimiter } from "../../middleware/rateLimiter";
 
 const router = Router();
 
 router.post(
   "/upload",
+  uploadTrackLimiter,
   authMiddleware,
   upload.fields([
     { name: "audio", maxCount: 1 },
