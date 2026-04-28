@@ -4,6 +4,19 @@ import streamifier from "streamifier";
 import { getAudioDuration } from "../../utils/audio";
 import { TrackAnalytics } from "../../models/TrackAnalitycs";
 import { generateWaveform } from "../../utils/waveform";
+import redis from "../../config/redis";
+
+async function invalidateTrackCache() {
+  const keys = await redis.keys("tracks:page:*");
+  const userKeys = await redis.keys("userTracks:*");
+  const searchKeys = await redis.keys("search:*");
+
+  const allKeys = [...keys, ...userKeys, ...searchKeys];
+
+  if (allKeys.length > 0) {
+    await redis.del(...allKeys);
+  }
+}
 
 const uploadToCloudinary = (
   buffer: Buffer,
@@ -81,16 +94,42 @@ export const uploadTrack = async (req: any) => {
 
   await saveTrackAnalytics(track.id, waveform as number[]);
 
+  await invalidateTrackCache();
+
   return track;
 };
 
-export const getAllTracks = async (userID?: string) => {
+export const getAllTracks = async (
+  userID?: string,
+  page: number = 1,
+  limit: number = 10,
+) => {
+  const cacheKey = `tracks:page:${page}:limit:${limit}:user:${userID || "guest"}`;
+  const cached = await redis.get(cacheKey);
+  if (cached) {
+    return JSON.parse(cached);
+  }
+
+  const skip = (page - 1) * limit;
+
   const tracks = await prisma.track.findMany({
+    skip,
+    take: limit,
     orderBy: { createdAt: "desc" },
     include: { author: true },
   });
 
-  if (!tracks) throw new Error("There is no uploaded tracks yet.");
+  if (tracks.length === 0) {
+    return {
+      tracks: [],
+      pagination: {
+        page,
+        limit,
+        total: 0,
+        totalPages: 0,
+      },
+    };
+  }
 
   const trackIds = tracks.map((t) => t.id);
 
@@ -122,7 +161,21 @@ export const getAllTracks = async (userID?: string) => {
     isLiked: likedSet.has(track.id),
   }));
 
-  return mergedTracks;
+  const total = await prisma.track.count();
+
+  const result = {
+    tracks: mergedTracks,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+
+  await redis.set(cacheKey, JSON.stringify(result), "EX", 60);
+
+  return result;
 };
 
 export const getSingleTrack = async (trackID: string, userID?: string) => {
@@ -176,20 +229,44 @@ export const getSingleTrack = async (trackID: string, userID?: string) => {
   };
 };
 
-export const getUsersTracks = async (username: string, userID?: string) => {
+export const getUsersTracks = async (
+  username: string,
+  userID?: string,
+  page: number = 1,
+  limit: number = 10,
+) => {
+  const cacheKey = `userTracks:${username}:page:${page}:limit:${limit}:user:${userID || "guest"}`;
+
+  const cached = await redis.get(cacheKey);
+  if (cached) return JSON.parse(cached);
+
   const user = await prisma.user.findUnique({
     where: { username },
-    include: {
-      tracks: {
-        include: { author: true },
-        orderBy: { createdAt: "desc" },
-      },
-    },
+    select: { id: true },
   });
 
   if (!user) throw new Error("User not found.");
 
-  const trackIds = user.tracks.map((t) => t.id);
+  const skip = (page - 1) * limit;
+
+  const tracks = await prisma.track.findMany({
+    where: { authorId: user.id },
+    skip,
+    take: limit,
+    orderBy: { createdAt: "desc" },
+    include: { author: true },
+  });
+
+  if (tracks.length === 0) {
+    const empty = {
+      tracks: [],
+      pagination: { page, limit, total: 0, totalPages: 0 },
+    };
+    await redis.set(cacheKey, JSON.stringify(empty), "EX", 60);
+    return empty;
+  }
+
+  const trackIds = tracks.map((t) => t.id);
 
   const analytics = await TrackAnalytics.find({
     trackId: { $in: trackIds },
@@ -210,7 +287,7 @@ export const getUsersTracks = async (username: string, userID?: string) => {
 
   const likedSet = new Set(userLikes.map((l) => l.trackID));
 
-  return user.tracks.map((track) => ({
+  const mergedTracks = tracks.map((track) => ({
     ...track,
     waveform: analyticsMap.get(track.id)?.waveform || [],
     likes: analyticsMap.get(track.id)?.likes || 0,
@@ -218,6 +295,24 @@ export const getUsersTracks = async (username: string, userID?: string) => {
     comments: analyticsMap.get(track.id)?.comments || 0,
     isLiked: likedSet.has(track.id),
   }));
+
+  const total = await prisma.track.count({
+    where: { authorId: user.id },
+  });
+
+  const result = {
+    tracks: mergedTracks,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+
+  await redis.set(cacheKey, JSON.stringify(result), "EX", 60);
+
+  return result;
 };
 
 export const deleteTrack = async (trackID: string) => {
@@ -251,6 +346,8 @@ export const deleteTrack = async (trackID: string) => {
   });
 
   await deleteTrackAnalytics(trackID);
+
+  await invalidateTrackCache();
 
   return deletedTrack;
 };
@@ -300,6 +397,8 @@ export const updateTrack = async (req: any) => {
     });
   });
 
+  await invalidateTrackCache();
+
   return updatedTrack;
 };
 
@@ -335,8 +434,17 @@ export const incrementTrackPlays = async (trackID: string, userID: string) => {
   return track;
 };
 
-export const searchTracks = async (filters: any, userID?: string) => {
+export const searchTracks = async (
+  filters: any,
+  userID?: string,
+  page: number = 1,
+  limit: number = 10,
+) => {
   const { q, trackType, key, bpm, isDownloadable } = filters;
+
+  const cacheKey = `search:${JSON.stringify(filters)}:page:${page}:limit:${limit}:user:${userID || "guest"}`;
+  const cached = await redis.get(cacheKey);
+  if (cached) return JSON.parse(cached);
 
   const where: any = {
     AND: [
@@ -357,8 +465,12 @@ export const searchTracks = async (filters: any, userID?: string) => {
     ],
   };
 
+  const skip = (page - 1) * limit;
+
   const tracks = await prisma.track.findMany({
     where,
+    skip,
+    take: limit,
     include: {
       author: {
         select: { username: true, profileImageURL: true },
@@ -367,7 +479,14 @@ export const searchTracks = async (filters: any, userID?: string) => {
     orderBy: { createdAt: "desc" },
   });
 
-  if (!tracks || tracks.length === 0) return [];
+  if (tracks.length === 0) {
+    const empty = {
+      tracks: [],
+      pagination: { page, limit, total: 0, totalPages: 0 },
+    };
+    await redis.set(cacheKey, JSON.stringify(empty), "EX", 60);
+    return empty;
+  }
 
   const trackIds = tracks.map((t) => t.id);
 
@@ -398,5 +517,19 @@ export const searchTracks = async (filters: any, userID?: string) => {
     isLiked: likedSet.has(track.id),
   }));
 
-  return mergedTracks;
+  const total = await prisma.track.count({ where });
+
+  const result = {
+    tracks: mergedTracks,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+
+  await redis.set(cacheKey, JSON.stringify(result), "EX", 60);
+
+  return result;
 };

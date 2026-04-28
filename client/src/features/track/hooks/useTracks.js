@@ -5,9 +5,10 @@ import { useAuthStore } from '../../auth/store/useAuthStore';
 
 export const useTracks = () => {
     const [tracks, setTracks] = useState([]);
+    const [page, setPage] = useState(1);
+    const [pagination, setPagination] = useState(null);
     
     const token = useAuthStore((state) => state.accessToken);
-
     const showAlert = useAlertStore((state) => state.showAlert);
 
     useEffect(() => {
@@ -15,16 +16,17 @@ export const useTracks = () => {
 
         const fetchTracks = async () => {
             try {
-                const data = await getAllTracks();
+                const data = await getAllTracks(page);
                 setTracks(data.tracks);
+                setPagination(data.pagination);
             } catch (error) {
                 showAlert(error.response?.data?.message || error.message, "error");
             }
         }
 
         fetchTracks();
-    }, [token]);
+    }, [token, page]);
 
-    return { tracks, setTracks };
+    return { tracks, setTracks, page, setPage, pagination };
 
 }

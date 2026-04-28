@@ -26,12 +26,14 @@ export const uploadTrack = async (req: Request, res: Response) => {
 export const getAllTracks = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user?.userId;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = 10;
 
-    const result = await trackService.getAllTracks(userId);
+    const result = await trackService.getAllTracks(userId, page, limit);
 
     res.status(200).json({
       message: "All tracks fetched successfully",
-      tracks: result,
+      ...result,
     });
   } catch (error) {
     if (error instanceof Error) {
@@ -50,7 +52,8 @@ export const getSingleTrack = async (req: Request, res: Response) => {
   const trackID = req.params.trackID;
   const userId = (req as any).user?.userId;
 
-  if (!trackID) res.status(404).json({ message: "Track ID is required." });
+  if (!trackID)
+    return res.status(404).json({ message: "Track ID is required." });
 
   try {
     const track = await trackService.getSingleTrack(
@@ -79,17 +82,23 @@ export const getUsersTracks = async (req: Request, res: Response) => {
   const username = req.params.username;
   const userId = (req as any).user?.userId;
 
-  if (!username) res.status(404).json({ message: "User ID is required." });
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = 10;
+
+  if (!username)
+    return res.status(404).json({ message: "User ID is required." });
 
   try {
-    const usersTracks = await trackService.getUsersTracks(
+    const result = await trackService.getUsersTracks(
       username as string,
       userId as string,
+      page,
+      limit,
     );
 
     res.status(200).json({
       message: "User's tracks fetched successfully.",
-      tracks: usersTracks,
+      ...result,
     });
   } catch (error) {
     if (error instanceof Error) {
@@ -187,7 +196,7 @@ export const incrementTrackPlays = async (req: Request, res: Response) => {
 
     const track = await trackService.incrementTrackPlays(
       trackId as string,
-      user.id as string,
+      user.userId as string,
     );
 
     return res.status(200).json({
@@ -209,10 +218,13 @@ export const incrementTrackPlays = async (req: Request, res: Response) => {
 
 export const searchTracks = async (req: Request, res: Response) => {
   try {
-    const tracks = await trackService.searchTracks(req.query);
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = 10;
+    const userId = (req as any).user?.userId;
+    const result = await trackService.searchTracks(req.query, userId, page, limit);
     return res.status(200).json({
       message: "Filtered tracks fetched successfully",
-      tracks,
+      ...result,
     });
   } catch (error) {
     if (error instanceof Error) {

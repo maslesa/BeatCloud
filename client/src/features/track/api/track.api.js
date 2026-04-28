@@ -1,12 +1,12 @@
 import { api } from '../../../shared/api/axios';
 
-export const getAllTracks = async () => {
-    const res = await api.get('/track/all');
+export const getAllTracks = async (page = 1) => {
+    const res = await api.get(`/track/all?page=${page}`);
     return res.data;
 }
 
-export const getUserTracks = async (username) => {
-    const res = await api.get(`/track/user/${username}`);
+export const getUserTracks = async (username, page = 1) => {
+    const res = await api.get(`/track/user/${username}?page=${page}`);
     return res.data;
 }
 
@@ -83,7 +83,7 @@ export const incrementTrackPlays = async(trackID) => {
     return res.data;
 }
 
-export const searchTracks = async(queryParams) => {
-    const res = await api.get(`/track/search?${queryParams}`);
+export const searchTracks = async(queryParams, page = 1) => {
+    const res = await api.get(`/track/search?${queryParams}&page=${page}`);
     return res.data;
 }

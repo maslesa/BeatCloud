@@ -3,6 +3,7 @@ import app from "./app";
 import { connectToMongoDB } from "./config/mongo";
 import { Server } from "socket.io";
 import http from "http";
+import redis from "./config/redis";
 
 const server = http.createServer(app);
 

@@ -8,7 +8,7 @@ import { TrackListSkeleton } from "../../../shared/components/TrackListSkeletons
 
 export default function Home() {
 
-  const { tracks, setTracks } = useTracks();
+  const { tracks, setTracks, page, setPage, pagination } = useTracks();
 
   const showAlert = useAlertStore((state) => state.showAlert);
 
@@ -17,7 +17,11 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (tracks && tracks.length > 0) setIsLoading(false);
+    setIsLoading(true);
+  }, [page]);
+
+  useEffect(() => {
+    if (tracks) setIsLoading(false);
   }, [tracks]);
 
   const openConfirmModal = (trackID) => {
@@ -41,15 +45,41 @@ export default function Home() {
     <>
       <div className="mt-5">
         <h1 className="text-2xl font-bold">Recent tracks</h1>
-        {tracks.length > 0 ?
-          (
-            isLoading ? <TrackListSkeleton /> : <TrackList tracks={tracks} onDelete={openConfirmModal} />
-          ) : (
-            <div className="h-50 w-full flex flex-col gap-5 justify-center items-center">
-              <img className="w-10 opacity-60" src="/icons/notfound.png" alt="" />
-              <p className="opacity-60">There are no tracks to display.</p>
+
+        {isLoading ? (
+          <TrackListSkeleton />
+        ) : tracks.length > 0 ? (
+          <>
+            <TrackList tracks={tracks} onDelete={openConfirmModal} />
+
+            <div className="flex justify-end items-center gap-1 mt-5">
+              <button
+                disabled={page === 1}
+                onClick={() => setPage((p) => p - 1)}
+                className="disabled:opacity-50 disabled:cursor-auto cursor-pointer"
+              >
+                <img className="w-5" src="/icons/prev.png" alt="" />
+              </button>
+
+              <span>
+                {page} / {pagination?.totalPages || 1}
+              </span>
+
+              <button
+                disabled={page === pagination?.totalPages}
+                onClick={() => setPage((p) => p + 1)}
+                className="disabled:opacity-50 disabled:cursor-auto cursor-pointer"
+              >
+                <img className="w-5" src="/icons/next.png" alt="" />
+              </button>
             </div>
-          )}
+          </>
+        ) : (
+          <div className="h-50 w-full flex flex-col gap-5 justify-center items-center">
+            <img className="w-10 opacity-60" src="/icons/notfound.png" alt="" />
+            <p className="opacity-60">There are no tracks to display.</p>
+          </div>
+        )}
       </div>
       <ConfirmModal
         isOpen={isConfirmOpen}
