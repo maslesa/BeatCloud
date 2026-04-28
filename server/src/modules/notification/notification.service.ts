@@ -14,6 +14,7 @@ export const getNotifications = async (userId: string) => {
       },
       track: {
         select: {
+          id: true,
           title: true,
           coverURL: true,
         },

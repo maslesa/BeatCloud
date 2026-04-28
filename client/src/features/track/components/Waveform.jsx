@@ -39,7 +39,7 @@ export default function Waveform({ track }) {
                             key={i}
                             className={`transition-all duration-200 flex-1 ${isActive
                                     ? 'bg-mylight opacity-100'
-                                    : 'bg-mylight/20 opacity-40 group-hover:opacity-60'
+                                    : 'bg-mylight/20 opacity-60 group-hover:opacity-80'
                                 }`}
                             style={{
                                 height: `${Math.max(v * 100, 5)}%`,

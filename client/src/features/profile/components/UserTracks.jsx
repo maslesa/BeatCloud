@@ -3,8 +3,9 @@ import TrackList from "../../track/components/TrackList";
 import { useUserTracks } from "../../track/hooks/useUserTracks";
 import { useParams } from 'react-router-dom';
 import { useAlertStore } from '../../../shared/hooks/useAlertStore';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ConfirmModal from "../../../shared/components/ConfirmModal";
+import { TrackListSkeleton } from "../../../shared/components/TrackListSkeletons";
 
 export default function UserTracks() {
 
@@ -14,6 +15,11 @@ export default function UserTracks() {
 
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [selectedTrack, setSelectedTrack] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        if (tracks && tracks.length > 0) setIsLoading(false);
+    }, [tracks]);
 
     const openConfirmModal = (trackID) => {
         setSelectedTrack(trackID);
@@ -39,7 +45,7 @@ export default function UserTracks() {
                 <h1 className="text-2xl font-bold">Tracks</h1>
                 {tracks.length > 0 ?
                     (
-                        <TrackList tracks={tracks} onDelete={openConfirmModal} />
+                        isLoading ? <TrackListSkeleton /> : <TrackList tracks={tracks} onDelete={openConfirmModal} />
                     ) : (
                         <div className="h-50 w-full flex flex-col gap-5 justify-center items-center">
                             <img className="w-10 opacity-60" src="/icons/notfound.png" alt="" />

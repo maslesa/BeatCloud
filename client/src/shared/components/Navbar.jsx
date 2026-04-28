@@ -158,7 +158,7 @@ export default function Navbar() {
               <div className="flex flex-col gap-2">
                 <label className="text-xs opacity-60 font-bold tracking-wider">Track Type</label>
                 <CustomDropdown
-                  options={[{value: '', label: 'All Types'}, ...trackTypeOptions]}
+                  options={[{ value: '', label: 'All Types' }, ...trackTypeOptions]}
                   value={filters.trackType}
                   onChange={(val) => updateFilter('trackType', val)}
                   className="w-full"
@@ -182,11 +182,11 @@ export default function Navbar() {
                   placeholder="e.g. 140"
                   value={filters.bpm}
                   onChange={(e) => {
-                                const value = e.target.value;
-                                if (/^\d*$/.test(value)) {
-                                    updateFilter('bpm', value);
-                                }
-                            }}
+                    const value = e.target.value;
+                    if (/^\d*$/.test(value)) {
+                      updateFilter('bpm', value);
+                    }
+                  }}
                   className="bg-mybg border-2 border-mylight rounded-md p-2 text-sm outline-none focus:ring-1 ring-mylight/50"
                 />
               </div>
@@ -234,12 +234,14 @@ export default function Navbar() {
             </button>
 
             <div className="relative" ref={notificationRef}>
-              <button
-                onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                className={`relative ${hasUnreadNotifications ? 'opacity-100' : 'opacity-60'} hover:opacity-100 cursor-pointer duration-200`}
-              >
-                <img className="w-5 rounded-full" src="/icons/notification.png" alt="" />
-              </button>
+              <div className="flex">
+                <button
+                  onClick={() => { setIsNotificationsOpen(!isNotificationsOpen); setIsMenuOpen(false); }}
+                  className={`relative ${hasUnreadNotifications ? 'opacity-100' : 'opacity-60'} hover:opacity-100 cursor-pointer duration-200`}
+                >
+                  <img className="w-5 rounded-full" src="/icons/notification.png" alt="" />
+                </button>
+              </div>
               {isNotificationsOpen && (
                 <div className="absolute -right-5 mt-4 w-80 bg-mybg2 border border-white/10 rounded-md shadow-xl overflow-hidden z-9999">
                   <div className="p-3 border-b border-white/5 font-bold text-lg">Notifications</div>
@@ -251,12 +253,17 @@ export default function Navbar() {
                           key={n.id}
                           className={`flex gap-1 py-2 h-18 justify-between items-center p-2 border-b border-white/5 text-xs hover:bg-white/5 cursor-pointer ${!n.isRead ? 'bg-white/5' : ''}`}
                         >
-                          <img className="min-w-8 max-w-8 mr-2" src={n.sender?.profileImageURL || '/icons/default-avatar.png'} alt="" />
+                          <img onClick={() => navigate(`/profile/${n.sender.username}`)} className="min-w-8 max-w-8 mr-2 hover:opacity-60 duration-200" src={n.sender?.profileImageURL || '/icons/default-avatar.png'} alt="" />
                           <div className="w-full flex flex-col gap-2">
-                            <p><b>{n.sender?.username}</b> {n.message}</p>
+                            <p title={n.message.length > 30 ? n.sender?.username + " " + n.message : ''}>
+                              <b>{n.sender?.username}</b>{" "}
+                              {n.message.length > 30
+                                ? n.message.slice(0, 30) + "..."
+                                : n.message}
+                            </p>
                             <p className="opacity-60">{new Date(n.createdAt).toLocaleTimeString()}</p>
                           </div>
-                          {n.track && (<img className="min-w-12 max-w-12 min-h-12 max-h-12" src={n.track?.coverURL} alt="" />)}
+                          {n.track && (<img onClick={() => navigate(`/track/${n.track?.id}`)} className="min-w-12 max-w-12 min-h-12 max-h-12 hover:opacity-60 duration-200" src={n.track?.coverURL} alt="" />)}
                         </div>
                       ))
                     ) : (
@@ -272,7 +279,7 @@ export default function Navbar() {
             <div className="relative flex items-center">
               <button
                 ref={triggerRef}
-                onClick={() => setIsMenuOpen(prev => !prev)}
+                onClick={() => { setIsMenuOpen(prev => !prev); setIsNotificationsOpen(false); }}
                 className="opacity-60 hover:opacity-100 cursor-pointer duration-200"
               >
                 <img className="w-5" src="/icons/more.png" alt="" />

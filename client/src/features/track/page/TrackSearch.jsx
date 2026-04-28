@@ -4,6 +4,7 @@ import { useAlertStore } from "../../../shared/hooks/useAlertStore";
 import { deleteTrack, searchTracks } from "../api/track.api";
 import TrackList from "../components/TrackList";
 import ConfirmModal from "../../../shared/components/ConfirmModal";
+import { TrackListSkeleton } from "../../../shared/components/TrackListSkeletons";
 
 export default function TrackSearch() {
 
@@ -13,6 +14,7 @@ export default function TrackSearch() {
 
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [selectedTrack, setSelectedTrack] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     const openConfirmModal = (trackID) => {
         setSelectedTrack(trackID);
@@ -34,10 +36,13 @@ export default function TrackSearch() {
     useEffect(() => {
         const fetchTracks = async () => {
             try {
+                setIsLoading(true);
                 const data = await searchTracks(searchParams.toString());
                 setTracks(data.tracks);
             } catch (error) {
                 showAlert(error.response?.data?.message || error.message, "error");
+            } finally {
+                setIsLoading(false);
             }
         }
 
@@ -51,7 +56,7 @@ export default function TrackSearch() {
                 <h1 className="text-2xl font-bold">{searchParams.get("q") ? `Results for "${searchParams.get("q")}"` : "Search Results"}</h1>
                 {tracks.length > 0 ?
                     (
-                        <TrackList tracks={tracks} onDelete={openConfirmModal} />
+                        isLoading ? <TrackListSkeleton /> : <TrackList tracks={tracks} onDelete={openConfirmModal} />
                     ) : (
                         <div className="h-50 w-full flex flex-col gap-5 justify-center items-center">
                             <img className="w-10 opacity-60" src="/icons/notfound.png" alt="" />

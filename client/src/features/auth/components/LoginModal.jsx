@@ -43,7 +43,7 @@ export default function LoginModal({ onClose }) {
       <div className="bg-mylight p-6 rounded-xl w-100 relative flex flex-col items-center">
         <h2 className="text-xl font-bold mb-10 text-mybg">Sign in</h2>
 
-        <input name="email" onChange={handleChange} className="border p-2 w-full mb-2 border-mybg text-mybg rounded" placeholder="Username" />
+        <input name="email" onChange={handleChange} className="border p-2 w-full mb-2 border-mybg text-mybg rounded" placeholder="Email" />
         <input name="password" onChange={handleChange} className="border p-2 w-full mb-4 border-mybg text-mybg rounded" type="password" placeholder="Password" />
 
         <button onClick={handleSubmit} className="bg-mybg text-mylight w-full py-3 rounded mb-5 flex items-center justify-center gap-2 cursor-pointer hover:bg-mybg2 duration-200">

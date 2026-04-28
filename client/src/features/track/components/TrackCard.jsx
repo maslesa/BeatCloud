@@ -85,7 +85,7 @@ export default function TrackCard({ track, loggedUser, onDelete }) {
                                 <img className="w-5" src={liked ? '/icons/liked.png' : '/icons/like.png'} alt="Like" />
                                 <p>{likes}</p>
                             </div>
-                            <div title="comment" className="flex gap-2 p-2 w-20 h-10 bg-mybg items-center justify-center rounded-md cursor-pointer hover:bg-mybg/80">
+                            <div onClick={handleTrackDetailsClick} title="comment" className="flex gap-2 p-2 w-20 h-10 bg-mybg items-center justify-center rounded-md cursor-pointer hover:bg-mybg/80">
                                 <img className="w-5" src="/icons/comment.png" alt="Comment" />
                                 <p>{track.comments}</p>
                             </div>

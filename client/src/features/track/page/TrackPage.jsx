@@ -127,10 +127,20 @@ export default function TrackPage() {
                 message="This track will be permanently deleted."
             />
             <div className='flex flex-col w-full gap-5'>
-                <div className='w-full h-100 flex gap-5 rounded-md bg-linear-to-r from-mybg2/30 to-mybg2/60 p-10'>
+                <div className='relative w-full h-100 flex gap-5 rounded-md p-10 overflow-hidden bg-mybg2/30'>
 
-                    <div className='flex-1 h-full flex flex-col justify-between overflow-hidden'>
+                    <div
+                        className="absolute inset-0 z-0"
+                        style={{
+                            backgroundImage: `url(${track.coverURL})`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                            filter: 'blur(20px) brightness(0.4)',
+                            transform: 'scale(1.1)'
+                        }}
+                    />
 
+                    <div className='relative z-10 flex-1 h-full flex flex-col justify-between overflow-hidden'>
                         <div className="w-full flex flex-col gap-5">
                             <div className='w-full flex gap-5'>
                                 <button onClick={() => playTrack(track)} className="cursor-pointer hover:opacity-80 duration-200">
@@ -184,7 +194,7 @@ export default function TrackPage() {
 
                     <img
                         className="hidden md:block w-64 h-64 md:w-80 md:h-80 object-cover rounded-md drop-shadow-xl shrink-0"
-                        src={track.coverURL || track.coverUrl}
+                        src={track.coverURL}
                         alt={track.title}
                     />
                 </div>
