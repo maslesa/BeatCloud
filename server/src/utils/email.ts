@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { logger } from "../config/logger";
 
 export async function sendMail(to: string, subject: string, html: string) {
   if (
@@ -6,7 +7,7 @@ export async function sendMail(to: string, subject: string, html: string) {
     !process.env.SMTP_USER ||
     !process.env.SMTP_PASS
   ) {
-    console.log("Email envs are not presented!");
+    logger.error("Email envs are not presented!");
     return;
   }
 

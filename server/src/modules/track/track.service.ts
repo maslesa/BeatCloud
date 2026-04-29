@@ -5,6 +5,7 @@ import { getAudioDuration } from "../../utils/audio";
 import { TrackAnalytics } from "../../models/TrackAnalitycs";
 import { generateWaveform } from "../../utils/waveform";
 import redis from "../../config/redis";
+import { logger } from "../../config/logger";
 
 async function invalidateTrackCache() {
   const keys = await redis.keys("tracks:page:*");
@@ -328,7 +329,7 @@ export const deleteTrack = async (trackID: string) => {
         resource_type: "video",
       });
     } catch (error) {
-      console.log("Failed to delete audio.");
+      logger.error("Failed to delete audio.");
     }
 
     try {
@@ -336,7 +337,7 @@ export const deleteTrack = async (trackID: string) => {
         resource_type: "image",
       });
     } catch (error) {
-      console.log("Failed to delete cover.");
+      logger.error("Failed to delete cover.");
     }
 
     return prisma.track.delete({
@@ -375,7 +376,7 @@ export const updateTrack = async (req: any) => {
           resource_type: "image",
         });
       } catch (error) {
-        console.log("Failed to delete old cover.");
+        logger.error("Failed to delete old cover.");
       }
 
       coverUpload = await uploadToCloudinary(coverFile.buffer, "image");

@@ -4,6 +4,7 @@ import { connectToMongoDB } from "./config/mongo";
 import { Server } from "socket.io";
 import http from "http";
 import redis from "./config/redis";
+import { logger } from "./config/logger";
 
 const server = http.createServer(app);
 
@@ -26,5 +27,5 @@ export { io };
 connectToMongoDB();
 
 server.listen(PORT, () => {
-  console.log(`Server is running on port: ${PORT}`);
+  logger.info(`Server is running on port: ${PORT}`);
 });
