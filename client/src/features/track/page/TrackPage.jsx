@@ -254,13 +254,14 @@ export default function TrackPage() {
                                 comments.map((c) => (
                                     <div key={c.id} className="flex items-center gap-3 animate-in fade-in duration-500">
                                         <img
-                                            className="w-10 h-10 rounded-full object-cover shrink-0"
+                                            onClick={() => navigate(`/profile/${c.user?.username}`)}
+                                            className="w-10 h-10 rounded-full object-cover shrink-0 cursor-pointer hover:opacity-80 duration-150"
                                             src={c.user?.profileImageURL || "/icons/default-avatar.png"}
                                             alt=""
                                         />
                                         <div className="flex flex-col bg-mybg2/30 p-3 rounded-lg w-full">
                                             <div className="flex justify-between items-center mb-1">
-                                                <span className="text-xs font-bold text-mylight">{c.user?.username}</span>
+                                                <span onClick={() => navigate(`/profile/${c.user?.username}`)} className="text-xs font-bold text-mylight cursor-pointer hover:opacity-80 duration-150">{c.user?.username}</span>
                                                 <span className="text-xs opacity-40">{new Date(c.createdAt).toLocaleDateString()}</span>
                                             </div>
                                             <p className="text-sm opacity-80 leading-relaxed">{c.content}</p>
